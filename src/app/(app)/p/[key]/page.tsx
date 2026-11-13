@@ -1,17 +1,11 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { issueStatus } from "@/db/schema";
+import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { getProject, listIssues } from "@/lib/issues";
+import { statusLabels } from "@/lib/labels";
 import { NewIssueDialog } from "./new-issue-dialog";
-
-const statusLabels: Record<(typeof issueStatus.enumValues)[number], string> = {
-  backlog: "Backlog",
-  todo: "Todo",
-  in_progress: "In Progress",
-  done: "Done",
-  canceled: "Canceled",
-};
 
 async function ProjectIssues({ params }: { params: PageProps<"/p/[key]">["params"] }) {
   await requireUser();
@@ -36,11 +30,13 @@ async function ProjectIssues({ params }: { params: PageProps<"/p/[key]">["params
             </h2>
             <ul className="divide-y border-y">
               {group.map((issue) => (
-                <li key={issue.id} className="flex gap-3 py-2 text-sm">
-                  <span className="w-16 shrink-0 font-mono text-muted-foreground">
-                    {issue.projectKey}-{issue.number}
-                  </span>
-                  {issue.title}
+                <li key={issue.id}>
+                  <Link href={`/p/${issue.projectKey}/${issue.number}`} className="flex gap-3 py-2 text-sm hover:bg-muted">
+                    <span className="w-16 shrink-0 font-mono text-muted-foreground">
+                      {issue.projectKey}-{issue.number}
+                    </span>
+                    {issue.title}
+                  </Link>
                 </li>
               ))}
             </ul>

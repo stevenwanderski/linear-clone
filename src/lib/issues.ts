@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { and, asc, eq, getTableColumns, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { issues, issueStatus, projects } from "@/db/schema";
+import { issues, issueStatus, projects, user } from "@/db/schema";
 
 // "WEB-42" (any case, extra spaces ok) -> { key: "WEB", number: 42 }. Returns null if it isn't a ref.
 export function parseRef(ref: string) {
@@ -135,4 +135,9 @@ export async function listProjects() {
 export async function getProject(key: string) {
   const [project] = await db.select().from(projects).where(eq(projects.key, key.toUpperCase()));
   return project ?? null;
+}
+
+// Everyone who can be assigned an issue (only allowlisted emails can sign in).
+export async function listUsers() {
+  return db.select({ id: user.id, name: user.name }).from(user).orderBy(asc(user.name));
 }

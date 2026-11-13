@@ -2,7 +2,8 @@
 
 import { refresh } from "next/cache";
 import { requireUser } from "@/lib/auth";
-import { createIssue, createIssueInput } from "@/lib/issues";
+import type { z } from "zod";
+import { createIssue, createIssueInput, updateIssue, type updateIssueInput } from "@/lib/issues";
 
 // `values` echoes back what was typed, so the form can refill itself after an error.
 export type CreateIssueState = { ok?: boolean; error?: string; values?: { title: string } };
@@ -20,4 +21,11 @@ export async function createIssueAction(
   await createIssue(user.id, input.data);
   refresh(); // re-render the page so the list shows the new issue
   return { ok: true };
+}
+
+// Changes are validated inside updateIssue, since anything can reach a server action.
+export async function updateIssueAction(ref: string, changes: z.input<typeof updateIssueInput>) {
+  await requireUser();
+  await updateIssue(ref, changes);
+  refresh();
 }
