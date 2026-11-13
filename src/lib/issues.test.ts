@@ -1,0 +1,52 @@
+import { describe, expect, it } from "vitest";
+import { createIssueInput, createProjectInput, parseRef, updateIssueInput } from "./issues";
+
+describe("parseRef", () => {
+  it("parses a ref, ignoring case and spaces", () => {
+    expect(parseRef("WEB-42")).toEqual({ key: "WEB", number: 42 });
+    expect(parseRef(" web-7 ")).toEqual({ key: "WEB", number: 7 });
+  });
+
+  it("returns null for things that aren't refs", () => {
+    for (const bad of ["WEB", "WEB-", "WEB-0", "WEB-abc", "42", "-42", "WEB-4-2", ""]) {
+      expect(parseRef(bad)).toBeNull();
+    }
+  });
+});
+
+describe("createProjectInput", () => {
+  it("uppercases and trims the key", () => {
+    expect(createProjectInput.parse({ key: " web ", name: "Website" }).key).toBe("WEB");
+  });
+
+  it("rejects bad keys and empty names", () => {
+    expect(createProjectInput.safeParse({ key: "W", name: "x" }).success).toBe(false);
+    expect(createProjectInput.safeParse({ key: "1WEB", name: "x" }).success).toBe(false);
+    expect(createProjectInput.safeParse({ key: "WEB", name: "  " }).success).toBe(false);
+  });
+});
+
+describe("createIssueInput", () => {
+  it("needs only a project key and a title", () => {
+    expect(createIssueInput.parse({ projectKey: "web", title: " Fix it " })).toEqual({
+      projectKey: "WEB",
+      title: "Fix it",
+    });
+  });
+
+  it("rejects an empty title, unknown status, and out-of-range priority", () => {
+    expect(createIssueInput.safeParse({ projectKey: "WEB", title: "" }).success).toBe(false);
+    expect(createIssueInput.safeParse({ projectKey: "WEB", title: "x", status: "nope" }).success).toBe(false);
+    expect(createIssueInput.safeParse({ projectKey: "WEB", title: "x", priority: 5 }).success).toBe(false);
+  });
+});
+
+describe("updateIssueInput", () => {
+  it("keeps only the fields passed", () => {
+    expect(updateIssueInput.parse({ status: "done" })).toEqual({ status: "done" });
+  });
+
+  it("allows clearing the assignee", () => {
+    expect(updateIssueInput.parse({ assigneeId: null })).toEqual({ assigneeId: null });
+  });
+});
