@@ -8,6 +8,13 @@
       "when": 1794602157129,
       "tag": "0000_marvelous_marvel_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794603942731,
+      "tag": "0001_foamy_whizzer",
+      "breakpoints": true
     }
   ]
 }

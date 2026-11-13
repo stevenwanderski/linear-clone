@@ -1,5 +1,16 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  pgEnum,
+  text,
+  timestamp,
+  boolean,
+  index,
+  uuid,
+  integer,
+  doublePrecision,
+  unique,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -91,3 +102,50 @@ export const accountRelations = relations(account, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+export const issueStatus = pgEnum("issue_status", [
+  "backlog",
+  "todo",
+  "in_progress",
+  "done",
+  "canceled",
+]);
+
+export const projects = pgTable("projects", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  key: text("key").notNull().unique(), // "WEB", used in issue IDs like WEB-42
+  name: text("name").notNull(),
+  description: text("description"),
+  issueCounter: integer("issue_counter").default(0).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export const issues = pgTable(
+  "issues",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    number: integer("number").notNull(),
+    title: text("title").notNull(),
+    description: text("description").default("").notNull(),
+    status: issueStatus("status").default("backlog").notNull(),
+    // 0 none, 1 urgent, 2 high, 3 medium, 4 low (Linear's order)
+    priority: integer("priority").default(0).notNull(),
+    assigneeId: text("assignee_id").references(() => user.id, { onDelete: "set null" }),
+    creatorId: text("creator_id")
+      .notNull()
+      .references(() => user.id),
+    sortOrder: doublePrecision("sort_order").default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("issues_project_number_unique").on(table.projectId, table.number),
+    index("issues_project_status_idx").on(table.projectId, table.status),
+  ],
+);
