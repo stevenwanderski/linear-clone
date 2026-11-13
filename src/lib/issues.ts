@@ -49,10 +49,11 @@ const issueWithKey = { ...getTableColumns(issues), projectKey: projects.key };
 const projectIdFor = (key: string) =>
   db.select({ id: projects.id }).from(projects).where(eq(projects.key, key));
 
+// Returns null if the key is already taken.
 export async function createProject(input: z.input<typeof createProjectInput>) {
   const data = createProjectInput.parse(input);
-  const [project] = await db.insert(projects).values(data).returning();
-  return project;
+  const [project] = await db.insert(projects).values(data).onConflictDoNothing({ target: projects.key }).returning();
+  return project ?? null;
 }
 
 export async function createIssue(userId: string, input: z.input<typeof createIssueInput>) {
@@ -121,4 +122,11 @@ export async function listIssues(filter: { projectKey?: string; status?: string;
       ),
     )
     .orderBy(asc(issues.sortOrder), asc(issues.number));
+}
+
+export async function listProjects() {
+  return db
+    .select({ id: projects.id, key: projects.key, name: projects.name })
+    .from(projects)
+    .orderBy(asc(projects.name));
 }

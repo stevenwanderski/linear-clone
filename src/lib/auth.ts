@@ -1,4 +1,6 @@
 import { betterAuth } from "better-auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
@@ -34,3 +36,11 @@ export const auth = betterAuth({
     },
   },
 });
+
+// For pages and server actions: the signed-in user, or a redirect to /login.
+// The proxy only checks that a cookie exists; this checks it's a real session.
+export async function requireUser() {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect("/login");
+  return session.user;
+}
