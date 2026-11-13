@@ -130,3 +130,9 @@ export async function listProjects() {
     .from(projects)
     .orderBy(asc(projects.name));
 }
+
+// Returns null if no project has this key.
+export async function getProject(key: string) {
+  const [project] = await db.select().from(projects).where(eq(projects.key, key.toUpperCase()));
+  return project ?? null;
+}
