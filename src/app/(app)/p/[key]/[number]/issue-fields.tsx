@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { toast } from "sonner";
 import { updateIssueAction } from "@/actions/issues";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,7 +14,14 @@ const priorityItems = priorityLabels.map((label, value) => ({ value, label }));
 
 function useSave(issueRef: string) {
   const [pending, startTransition] = useTransition();
-  const save = (changes: Changes) => startTransition(() => updateIssueAction(issueRef, changes));
+  const save = (changes: Changes) =>
+    startTransition(async () => {
+      try {
+        await updateIssueAction(issueRef, changes);
+      } catch {
+        toast.error("Couldn't save that change. Try again.");
+      }
+    });
   return { pending, save };
 }
 
@@ -24,7 +32,7 @@ export function IssueTitle({ issueRef, title }: { issueRef: string; title: strin
     <Input
       aria-label="Title"
       defaultValue={title}
-      className="mb-4 h-auto border-none px-0 text-xl font-semibold shadow-none focus-visible:ring-0 md:text-xl"
+      className="mb-4 h-auto border-none px-0 text-xl font-semibold shadow-none focus-visible:ring-0 md:text-xl dark:bg-transparent"
       onKeyDown={(e) => {
         if (e.key === "Enter") e.currentTarget.blur();
         if (e.key === "Escape") {

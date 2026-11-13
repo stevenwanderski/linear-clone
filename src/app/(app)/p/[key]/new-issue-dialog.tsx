@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { toast } from "sonner";
 import { createIssueAction, type CreateIssueState } from "@/actions/issues";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -25,9 +26,14 @@ export function NewIssueDialog({ projectKey }: { projectKey: string }) {
 // Lives inside DialogContent, which unmounts on close, so errors reset each time the dialog opens.
 function NewIssueForm({ projectKey, onCreated }: { projectKey: string; onCreated: () => void }) {
   const [state, formAction, pending] = useActionState(async (prev: CreateIssueState, formData: FormData) => {
-    const result = await createIssueAction(projectKey, prev, formData);
-    if (result.ok) onCreated();
-    return result;
+    try {
+      const result = await createIssueAction(projectKey, prev, formData);
+      if (result.ok) onCreated();
+      return result;
+    } catch {
+      toast.error("Couldn't create the issue. Try again.");
+      return { values: { title: String(formData.get("title") ?? "") } };
+    }
   }, {});
 
   return (

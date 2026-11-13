@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { toast } from "sonner";
 import { createProjectAction, type CreateProjectState } from "@/actions/projects";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -25,9 +26,14 @@ export function NewProjectDialog() {
 // Lives inside DialogContent, which unmounts on close, so errors reset each time the dialog opens.
 function NewProjectForm({ onCreated }: { onCreated: () => void }) {
   const [state, formAction, pending] = useActionState(async (prev: CreateProjectState, formData: FormData) => {
-    const result = await createProjectAction(prev, formData);
-    if (result.ok) onCreated();
-    return result;
+    try {
+      const result = await createProjectAction(prev, formData);
+      if (result.ok) onCreated();
+      return result;
+    } catch {
+      toast.error("Couldn't create the project. Try again.");
+      return { values: { name: String(formData.get("name") ?? ""), key: String(formData.get("key") ?? "") } };
+    }
   }, {});
 
   return (

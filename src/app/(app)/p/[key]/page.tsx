@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { notFound } from "next/navigation";
 import { issueStatus } from "@/db/schema";
 import Link from "next/link";
@@ -19,7 +20,11 @@ async function ProjectIssues({ params }: { params: PageProps<"/p/[key]">["params
         <h1 className="text-lg font-semibold">{project.name}</h1>
         <NewIssueDialog projectKey={project.key} />
       </div>
-      {issues.length === 0 && <p className="text-sm text-muted-foreground">No issues yet</p>}
+      {issues.length === 0 && (
+        <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
+          No issues yet. Use <span className="font-medium text-foreground">New issue</span> to add the first one.
+        </div>
+      )}
       {issueStatus.enumValues.map((status) => {
         const group = issues.filter((issue) => issue.status === status);
         if (group.length === 0) return null;
@@ -51,7 +56,14 @@ async function ProjectIssues({ params }: { params: PageProps<"/p/[key]">["params
 export default function ProjectPage({ params }: PageProps<"/p/[key]">) {
   return (
     <main className="p-8">
-      <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
+      <Suspense
+        fallback={
+          <div className="grid gap-3">
+            <Skeleton className="mb-3 h-6 w-48" />
+            {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-8 w-full" />)}
+          </div>
+        }
+      >
         <ProjectIssues params={params} />
       </Suspense>
     </main>

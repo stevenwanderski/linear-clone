@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Markdown from "react-markdown";
+import { toast } from "sonner";
 import { updateIssueAction } from "@/actions/issues";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,8 +52,12 @@ export function IssueDescription({ issueRef, description }: { issueRef: string; 
           disabled={pending}
           onClick={() =>
             startTransition(async () => {
-              await updateIssueAction(issueRef, { description: draft });
-              setDraft(null);
+              try {
+                await updateIssueAction(issueRef, { description: draft });
+                setDraft(null);
+              } catch {
+                toast.error("Couldn't save the description. Try again."); // the draft stays open, so nothing is lost
+              }
             })
           }
         >
