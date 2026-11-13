@@ -1,8 +1,9 @@
-# Linear-lite
+# Happy Linear
 
 A small Linear clone: projects + issues, keyboard-driven UI, and an MCP server so Claude can manage issues. Next.js on Netlify, Neon Postgres, Drizzle, Better Auth.
 
 Repo: https://github.com/stevenwanderski/linear-clone (public, branch `main`). Never commit secrets or `.env*` files.
+Live site: https://happy-linear.netlify.app (Netlify auto-deploys every push to `main`).
 
 The full plan is in `BUILD_PLAN.md`. Read it when a card needs more detail.
 
