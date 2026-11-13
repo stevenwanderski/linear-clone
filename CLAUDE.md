@@ -30,3 +30,4 @@ The work is split into Linear cards (team "Happy Code", project "Linear", titled
 <!-- One line each: what we chose and why. -->
 - Node 22 (`.nvmrc`), because the Better Auth CLI needs it. Netlify reads `.nvmrc` too.
 - Dev server runs on port 3001 (`npm run dev`), because another project always uses 3000.
+- Vitest tests cover only DB-free code (ref parsing, validation): there is no test database, only the live one.
