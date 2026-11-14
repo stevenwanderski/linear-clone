@@ -19,8 +19,6 @@ export const projectColors = {
   green: "#3fb57a",
   teal: "#22b0c4",
   blue: "#4a9cf5",
-  indigo: "#6670db",
-  purple: "#9a5ae0",
   pink: "#de5aa0",
 };
 export type ProjectColor = keyof typeof projectColors;
