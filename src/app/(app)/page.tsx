@@ -1,25 +1,35 @@
 import { Suspense } from "react";
-import Link from "next/link";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { Skeleton } from "@/components/ui/skeleton";
+import { requireUser } from "@/lib/auth";
+import { listIssues } from "@/lib/issues";
+import { IssueGroups } from "./issue-groups";
 
-// Temporary home page. Replaced by "My issues" in card 15.
-async function CurrentUser() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return <Link className="underline" href="/login">Sign in</Link>;
-  return (
-    <p>
-      Signed in as {session.user.name} ({session.user.email})
-    </p>
-  );
+async function OpenIssues() {
+  await requireUser();
+  const issues = await listIssues({ openOnly: true });
+  if (issues.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
+        No open issues. Everything is done.
+      </div>
+    );
+  }
+  return <IssueGroups rows={issues} />;
 }
 
+// Every open issue across all projects. Login lands here.
 export default function Home() {
   return (
     <main className="p-8">
-      <h1 className="text-xl font-semibold">Happy Linear</h1>
-      <Suspense fallback={<p>Loading…</p>}>
-        <CurrentUser />
+      <h1 className="mb-6 text-lg font-semibold">Open issues</h1>
+      <Suspense
+        fallback={
+          <div className="grid gap-3">
+            {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-8 w-full" />)}
+          </div>
+        }
+      >
+        <OpenIssues />
       </Suspense>
     </main>
   );

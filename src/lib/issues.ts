@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { and, asc, eq, getTableColumns, sql } from "drizzle-orm";
+import { and, asc, eq, getTableColumns, notInArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { issues, issueStatus, projects, user } from "@/db/schema";
 
@@ -108,7 +108,10 @@ export async function updateIssue(ref: string, input: z.input<typeof updateIssue
   return getIssue(ref);
 }
 
-export async function listIssues(filter: { projectKey?: string; status?: string; assigneeId?: string } = {}) {
+// `openOnly` leaves out Done and Canceled.
+export async function listIssues(
+  filter: { projectKey?: string; status?: string; assigneeId?: string; openOnly?: boolean } = {},
+) {
   const status = filter.status === undefined ? undefined : issueFields.status.parse(filter.status);
   return db
     .select(issueWithKey)
@@ -119,6 +122,7 @@ export async function listIssues(filter: { projectKey?: string; status?: string;
         filter.projectKey ? eq(projects.key, filter.projectKey.toUpperCase()) : undefined,
         status ? eq(issues.status, status) : undefined,
         filter.assigneeId ? eq(issues.assigneeId, filter.assigneeId) : undefined,
+        filter.openOnly ? notInArray(issues.status, ["done", "canceled"]) : undefined,
       ),
     )
     .orderBy(asc(issues.sortOrder), asc(issues.number));
