@@ -128,4 +128,10 @@
   html {
     @apply font-sans;
   }
+  /* Tailwind v4 resets buttons to the default arrow; bring back the pointer for anything clickable. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  a[href] {
+    cursor: pointer;
+  }
 }
