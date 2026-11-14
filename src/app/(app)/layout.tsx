@@ -1,10 +1,13 @@
 import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { ListTodoIcon } from "lucide-react";
+import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { Skeleton } from "@/components/ui/skeleton";
 import { requireUser } from "@/lib/auth";
 import { listProjects } from "@/lib/issues";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { AccountMenu } from "./account-menu";
+import { NavLink } from "./nav-link";
 import { SidebarProjects } from "./sidebar-projects";
 
 async function ProjectList() {
@@ -17,18 +20,26 @@ async function Account() {
   return <AccountMenu name={user.name} email={user.email} image={user.image} />;
 }
 
+// The sidebar sits on a darker background and each page is a rounded panel beside it.
 export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
-    <div className="flex min-h-screen">
-      <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col overflow-y-auto border-r bg-sidebar p-3 text-sidebar-foreground">
-        <div className="mb-4 flex items-center justify-between px-2">
-          <Link href="/" className="font-semibold">Happy Linear</Link>
+    <div className="flex h-screen bg-sidebar">
+      <aside className="flex w-60 shrink-0 flex-col overflow-y-auto p-3 text-sidebar-foreground">
+        <div className="mb-3 flex items-center justify-between pl-1">
+          <Link href="/" className="flex items-center gap-2 text-[13px] font-semibold">
+            <Logo className="size-5" />
+            Happy Linear
+          </Link>
           <ThemeToggle />
         </div>
+        <NavLink href="/" exact>
+          <ListTodoIcon className="size-4" />
+          Open issues
+        </NavLink>
         {/* Reads the session and the DB at request time, so it streams in behind a boundary. */}
         <Suspense
           fallback={
-            <div className="grid gap-2 px-2">
+            <div className="mt-4 grid gap-2 px-2">
               <p className="mb-1 text-xs font-medium text-muted-foreground">Projects</p>
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
@@ -37,13 +48,13 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         >
           <ProjectList />
         </Suspense>
-        <div className="mt-auto">
+        <div className="mt-auto pt-3">
           <Suspense fallback={<Skeleton className="mx-2 h-8 w-32" />}>
             <Account />
           </Suspense>
         </div>
       </aside>
-      <div className="flex-1">{children}</div>
+      <div className="my-2 mr-2 min-w-0 flex-1 overflow-y-auto rounded-xl border bg-background shadow-sm">{children}</div>
     </div>
   );
 }

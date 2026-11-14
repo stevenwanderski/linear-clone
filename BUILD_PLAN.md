@@ -23,7 +23,7 @@ A stripped-down Linear: **projects and issues only**, fast keyboard-driven UI, a
 
 ## 2. Scope
 
-**In:** GitHub login, projects, issues (title, markdown description, status, priority, assignee), list + board views, ⌘K palette, keyboard shortcuts, MCP server.
+**In:** GitHub login, projects, issues (title, markdown description, status, assignee), list + board views, ⌘K palette, keyboard shortcuts, MCP server.
 
 **Out (v1):** comments, labels, cycles, teams/workspaces, notifications, attachments, real-time sync, webhooks, mobile app.
 
@@ -52,7 +52,6 @@ issues
   title         text
   description   text default ''    // markdown
   status        enum('backlog','todo','in_progress','done','canceled') default 'backlog'
-  priority      int 0..4 default 0 // 0 none, 1 urgent, 2 high, 3 medium, 4 low (Linear's order)
   assignee_id   text fk -> users null
   creator_id    text fk -> users
   sort_order    double precision   // ordering within a status column
@@ -106,9 +105,9 @@ Endpoint: `https://<site>.netlify.app/api/mcp`
 | Tool | Input | Returns |
 |---|---|---|
 | `list_projects` | — | key, name, open issue count |
-| `list_issues` | `project?`, `status?`, `assignee?` (`"me"` ok), `query?`, `limit?` | compact list: `WEB-42`, title, status, priority |
+| `list_issues` | `project?`, `status?`, `assignee?` (`"me"` ok), `query?`, `limit?` | compact list: `WEB-42`, title, status |
 | `get_issue` | `id` ("WEB-42") | full issue incl. description |
-| `create_issue` | `project`, `title`, `description?`, `status?`, `priority?`, `assignee?` | created issue |
+| `create_issue` | `project`, `title`, `description?`, `status?`, `assignee?` | created issue |
 | `update_issue` | `id`, any of the fields above | updated issue |
 | `create_project` | `key`, `name`, `description?` | created project |
 
@@ -146,19 +145,19 @@ Each phase ends deployed and working on Netlify.
 - `lib/issues.ts` with Zod-validated create/update/list/get.
 - Sidebar with projects, create-project dialog.
 - Project page: issue list grouped by status; create-issue dialog.
-- Issue detail page: edit title, description (textarea + preview), status, priority, assignee.
+- Issue detail page: edit title, description (textarea + preview), status, assignee.
 - **Done when:** you can manage real issues end to end on the live site.
 
 ### Phase 3 — Make it feel like Linear (1–2 days)
 - ⌘K palette: jump to project/issue, create issue.
-- Shortcuts: `c` create, `j/k` move, `s` status, `p` priority, `a` assignee, `esc` back.
+- Shortcuts: `c` create, `j/k` move, `s` status, `a` assignee, `esc` back.
 - Board view with drag between status columns (`@dnd-kit`, updates `status` + `sort_order`).
 - Optimistic updates (`useOptimistic`) so changes appear instantly.
 - "My issues" home page.
 - **Done when:** you can triage without touching the mouse.
 
 ### Phase 4 — Search & filters (½ day)
-- Filter by status/priority/assignee in the URL query string (shareable links).
+- Filter by status/assignee in the URL query string (shareable links).
 - Title/description search with Postgres `ILIKE` (upgrade to full-text search only if it gets slow).
 
 ### Phase 5 — MCP server with API keys (1 day)

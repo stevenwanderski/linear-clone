@@ -1,9 +1,10 @@
 "use client";
 
 import { useOptimistic } from "react";
-import Link from "next/link";
 import { toast } from "sonner";
 import { createProjectAction } from "@/actions/projects";
+import { ProjectBadge } from "@/components/project-badge";
+import { NavLink } from "./nav-link";
 import { NewProjectDialog } from "./new-project-dialog";
 
 type Project = { id: string; key: string; name: string; pending?: boolean };
@@ -29,27 +30,25 @@ export function SidebarProjects({ projects }: { projects: Project[] }) {
 
   return (
     <>
-      <div className="mb-1 flex items-center justify-between px-2">
+      <div className="mt-4 mb-1 flex h-6 items-center justify-between px-2">
         <h2 className="text-xs font-medium text-muted-foreground">Projects</h2>
         <NewProjectDialog onCreate={create} />
       </div>
-      {shown.length === 0 && <p className="px-2 text-sm text-muted-foreground">No projects yet. Use + to add one.</p>}
-      <ul>
+      {shown.length === 0 && <p className="px-2 text-[13px] text-muted-foreground">No projects yet. Use + to add one.</p>}
+      <ul className="grid gap-px">
         {shown.map((p) => {
           const content = (
             <>
-              <span className="w-10 font-mono text-muted-foreground">{p.key}</span>
-              {p.name}
+              <ProjectBadge projectKey={p.key} />
+              <span className="truncate">{p.name}</span>
             </>
           );
           return (
             <li key={p.id}>
               {p.pending ? (
-                <div className="flex gap-2 px-2 py-1 text-sm opacity-60">{content}</div>
+                <div className="flex h-7 items-center gap-2 px-2 text-[13px] opacity-60">{content}</div>
               ) : (
-                <Link href={`/p/${p.key}`} className="flex gap-2 rounded-md px-2 py-1 text-sm hover:bg-sidebar-accent">
-                  {content}
-                </Link>
+                <NavLink href={`/p/${p.key}`}>{content}</NavLink>
               )}
             </li>
           );

@@ -4,7 +4,9 @@ import { useOptimistic } from "react";
 import { toast } from "sonner";
 import { createIssueAction } from "@/actions/issues";
 import type { listIssues } from "@/lib/issues";
-import { IssueGroups, type IssueRow } from "../../issue-groups";
+import { PageHeader } from "@/components/page-header";
+import { ProjectBadge } from "@/components/project-badge";
+import { EmptyState, IssueGroups, type IssueRow } from "../../issue-groups";
 import { NewIssueDialog } from "./new-issue-dialog";
 
 type Issue = Awaited<ReturnType<typeof listIssues>>[number];
@@ -29,14 +31,13 @@ export function IssueList({ project, issues }: { project: { key: string; name: s
 
   return (
     <>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">{project.name}</h1>
+      <PageHeader title={<><ProjectBadge projectKey={project.key} />{project.name}</>}>
         <NewIssueDialog projectKey={project.key} onCreate={create} />
-      </div>
+      </PageHeader>
       {rows.length === 0 && (
-        <div className="rounded-lg border border-dashed p-10 text-center text-sm text-muted-foreground">
+        <EmptyState>
           No issues yet. Use <span className="font-medium text-foreground">New issue</span> to add the first one.
-        </div>
+        </EmptyState>
       )}
       <IssueGroups rows={rows} />
     </>

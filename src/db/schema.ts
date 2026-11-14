@@ -131,8 +131,6 @@ export const issues = pgTable(
     title: text("title").notNull(),
     description: text("description").default("").notNull(),
     status: issueStatus("status").default("backlog").notNull(),
-    // 0 none, 1 urgent, 2 high, 3 medium, 4 low (Linear's order)
-    priority: integer("priority").default(0).notNull(),
     assigneeId: text("assignee_id").references(() => user.id, { onDelete: "set null" }),
     creatorId: text("creator_id")
       .notNull()

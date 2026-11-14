@@ -15,6 +15,13 @@
       "when": 1794603942731,
       "tag": "0001_foamy_whizzer",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794623733408,
+      "tag": "0002_low_meteorite",
+      "breakpoints": true
     }
   ]
 }

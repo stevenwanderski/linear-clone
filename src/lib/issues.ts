@@ -20,7 +20,6 @@ const issueFields = {
   title: z.string().trim().min(1, "Title is required").max(200),
   description: z.string(),
   status: z.enum(issueStatus.enumValues),
-  priority: z.number().int().min(0).max(4), // 0 none, 1 urgent ... 4 low
   assigneeId: z.string().nullable(),
 };
 
@@ -35,7 +34,6 @@ export const createIssueInput = z.object({
   ...issueFields,
   description: issueFields.description.optional(),
   status: issueFields.status.optional(),
-  priority: issueFields.priority.optional(),
   assigneeId: issueFields.assigneeId.optional(),
 });
 
@@ -67,9 +65,9 @@ export async function createIssue(userId: string, input: z.input<typeof createIs
       WHERE key = ${projectKey}
       RETURNING id, issue_counter
     )
-    INSERT INTO ${issues} (project_id, number, title, description, status, priority, assignee_id, creator_id)
+    INSERT INTO ${issues} (project_id, number, title, description, status, assignee_id, creator_id)
     SELECT n.id, n.issue_counter, ${data.title}, ${data.description ?? ""},
-           ${data.status ?? "backlog"}::issue_status, ${data.priority ?? 0}::int, ${data.assigneeId ?? null}, ${userId}
+           ${data.status ?? "backlog"}::issue_status, ${data.assigneeId ?? null}, ${userId}
     FROM n
     RETURNING id
   `);

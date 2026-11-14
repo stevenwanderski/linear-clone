@@ -1,8 +1,8 @@
 import { Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getProject, listIssues } from "@/lib/issues";
+import { ListSkeleton } from "../../issue-groups";
 import { IssueList } from "./issue-list";
 
 async function ProjectIssues({ params }: { params: PageProps<"/p/[key]">["params"] }) {
@@ -17,13 +17,13 @@ async function ProjectIssues({ params }: { params: PageProps<"/p/[key]">["params
 // The project key comes from the URL, which is only known at request time, so the content streams in.
 export default function ProjectPage({ params }: PageProps<"/p/[key]">) {
   return (
-    <main className="p-8">
+    <main>
       <Suspense
         fallback={
-          <div className="grid gap-3">
-            <Skeleton className="mb-3 h-6 w-48" />
-            {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-8 w-full" />)}
-          </div>
+          <>
+            <div className="h-12 border-b" />
+            <ListSkeleton />
+          </>
         }
       >
         <ProjectIssues params={params} />

@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { ChevronRightIcon } from "lucide-react";
+import { PageHeader } from "@/components/page-header";
+import { ProjectBadge } from "@/components/project-badge";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getIssue, listUsers } from "@/lib/issues";
@@ -16,32 +19,45 @@ async function IssueDetail({ params }: { params: PageProps<"/p/[key]/[number]">[
   const issueRef = `${issue.projectKey}-${issue.number}`;
 
   return (
-    <div className="flex gap-8">
-      <article className="min-w-0 flex-1">
-        <p className="mb-1 font-mono text-sm text-muted-foreground">
-          <Link href={`/p/${issue.projectKey}`} className="hover:underline">{issue.projectKey}</Link>-{issue.number}
-        </p>
-        <IssueTitle key={issue.title} issueRef={issueRef} title={issue.title} />
-        <IssueDescription issueRef={issueRef} description={issue.description} />
-      </article>
-      <IssueFields
-        issueRef={issueRef}
-        status={issue.status}
-        priority={issue.priority}
-        assigneeId={issue.assigneeId}
-        users={users}
+    <>
+      <PageHeader
+        title={
+          <>
+            <Link href={`/p/${issue.projectKey}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+              <ProjectBadge projectKey={issue.projectKey} />
+              {issue.projectKey}
+            </Link>
+            <ChevronRightIcon className="size-3.5 text-muted-foreground" />
+            <span>{issueRef}</span>
+          </>
+        }
       />
-    </div>
+      <div className="flex min-h-[calc(100%-3rem)]">
+        <article className="mx-auto w-full max-w-3xl min-w-0 flex-1 px-10 py-8">
+          <IssueTitle key={issue.title} issueRef={issueRef} title={issue.title} />
+          <IssueDescription issueRef={issueRef} description={issue.description} />
+        </article>
+        <aside className="w-72 shrink-0 border-l p-4">
+          <h2 className="mb-3 px-2 text-xs font-medium text-muted-foreground">Properties</h2>
+          <IssueFields
+            issueRef={issueRef}
+            status={issue.status}
+            assigneeId={issue.assigneeId}
+            users={users}
+          />
+        </aside>
+      </div>
+    </>
   );
 }
 
 // The ref comes from the URL, which is only known at request time, so the content streams in.
 export default function IssuePage({ params }: PageProps<"/p/[key]/[number]">) {
   return (
-    <main className="p-8">
+    <main className="h-full">
       <Suspense
         fallback={
-          <div className="flex gap-8">
+          <div className="flex gap-8 p-8">
             <div className="grid flex-1 content-start gap-3">
               <Skeleton className="h-4 w-12" />
               <Skeleton className="h-7 w-2/3" />

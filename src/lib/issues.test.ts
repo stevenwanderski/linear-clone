@@ -34,10 +34,9 @@ describe("createIssueInput", () => {
     });
   });
 
-  it("rejects an empty title, unknown status, and out-of-range priority", () => {
+  it("rejects an empty title, and unknown status", () => {
     expect(createIssueInput.safeParse({ projectKey: "WEB", title: "" }).success).toBe(false);
     expect(createIssueInput.safeParse({ projectKey: "WEB", title: "x", status: "nope" }).success).toBe(false);
-    expect(createIssueInput.safeParse({ projectKey: "WEB", title: "x", priority: 5 }).success).toBe(false);
   });
 });
 

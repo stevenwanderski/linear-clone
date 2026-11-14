@@ -9,5 +9,3 @@ export const statusLabels: Record<(typeof issueStatus.enumValues)[number], strin
   canceled: "Canceled",
 };
 
-// Index = priority value (0 none, 1 urgent ... 4 low).
-export const priorityLabels = ["No priority", "Urgent", "High", "Medium", "Low"];

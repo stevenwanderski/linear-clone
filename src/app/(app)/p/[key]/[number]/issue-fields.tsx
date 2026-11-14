@@ -5,12 +5,23 @@ import { toast } from "sonner";
 import { updateIssueAction } from "@/actions/issues";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { priorityLabels, statusLabels } from "@/lib/labels";
+import { StatusIcon } from "@/components/issue-icons";
+import { statusLabels } from "@/lib/labels";
 
 type Changes = Parameters<typeof updateIssueAction>[1];
 
-const statusItems = Object.entries(statusLabels).map(([value, label]) => ({ value, label }));
-const priorityItems = priorityLabels.map((label, value) => ({ value, label }));
+const withIcon = (icon: React.ReactNode, label: string) => (
+  <span className="flex items-center gap-2">
+    {icon}
+    {label}
+  </span>
+);
+const statusItems = (Object.entries(statusLabels) as [Changes["status"] & string, string][]).map(([value, label]) => ({
+  value,
+  label: withIcon(<StatusIcon status={value} />, label),
+}));
+// Borderless triggers, like Linear's property panel.
+const trigger = "w-full border-none bg-transparent shadow-none hover:bg-muted dark:bg-transparent dark:hover:bg-muted";
 
 // `showNow` displays the change before the server answers. When the save finishes, React drops it and
 // shows the real props again: the new value after a refresh, or the old one if the save failed.
@@ -36,7 +47,7 @@ export function IssueTitle({ issueRef, title }: { issueRef: string; title: strin
     <Input
       aria-label="Title"
       defaultValue={title}
-      className="mb-4 h-auto border-none px-0 text-xl font-semibold shadow-none focus-visible:ring-0 md:text-xl dark:bg-transparent"
+      className="mb-4 h-auto border-none px-0 text-2xl font-semibold shadow-none focus-visible:ring-0 md:text-2xl dark:bg-transparent"
       onKeyDown={(e) => {
         if (e.key === "Enter") e.currentTarget.blur();
         if (e.key === "Escape") {
@@ -57,41 +68,31 @@ export function IssueTitle({ issueRef, title }: { issueRef: string; title: strin
 export function IssueFields(props: {
   issueRef: string;
   status: string;
-  priority: number;
   assigneeId: string | null;
   users: { id: string; name: string }[];
 }) {
   const [shown, showNow] = useOptimistic(
-    { status: props.status, priority: props.priority, assigneeId: props.assigneeId },
+    { status: props.status, assigneeId: props.assigneeId },
     (current, changes: Changes) => ({ ...current, ...changes }),
   );
   const { pending, save } = useSave(props.issueRef, showNow);
   const userItems = [{ value: null, label: "Unassigned" }, ...props.users.map((u) => ({ value: u.id, label: u.name }))];
 
   return (
-    <dl className="grid w-64 shrink-0 grid-cols-[auto_1fr] content-start items-center gap-x-4 gap-y-2 text-sm" aria-busy={pending}>
-      <dt className="text-muted-foreground">Status</dt>
+    <dl className="grid grid-cols-[4.5rem_1fr] items-center gap-x-2 gap-y-1 text-[13px]" aria-busy={pending}>
+      <dt className="px-2 text-muted-foreground">Status</dt>
       <dd>
         <Select items={statusItems} value={shown.status} onValueChange={(status) => status && save({ status: status as Changes["status"] })}>
-          <SelectTrigger size="sm" className="w-full" aria-label="Status"><SelectValue /></SelectTrigger>
+          <SelectTrigger size="sm" className={trigger} aria-label="Status"><SelectValue /></SelectTrigger>
           <SelectContent>
             {statusItems.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
           </SelectContent>
         </Select>
       </dd>
-      <dt className="text-muted-foreground">Priority</dt>
-      <dd>
-        <Select items={priorityItems} value={shown.priority} onValueChange={(priority) => priority !== null && save({ priority })}>
-          <SelectTrigger size="sm" className="w-full" aria-label="Priority"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            {priorityItems.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </dd>
-      <dt className="text-muted-foreground">Assignee</dt>
+      <dt className="px-2 text-muted-foreground">Assignee</dt>
       <dd>
         <Select items={userItems} value={shown.assigneeId} onValueChange={(assigneeId) => save({ assigneeId })}>
-          <SelectTrigger size="sm" className="w-full" aria-label="Assignee"><SelectValue /></SelectTrigger>
+          <SelectTrigger size="sm" className={trigger} aria-label="Assignee"><SelectValue /></SelectTrigger>
           <SelectContent>
             {userItems.map((item) => <SelectItem key={item.value ?? "none"} value={item.value}>{item.label}</SelectItem>)}
           </SelectContent>
