@@ -5,7 +5,7 @@ import type { listIssues } from "@/lib/issues";
 import { statusLabels } from "@/lib/labels";
 
 type Issue = Awaited<ReturnType<typeof listIssues>>[number];
-export type IssueRow = Pick<Issue, "id" | "number" | "title" | "status" | "projectKey"> & { pending?: boolean };
+export type IssueRow = Pick<Issue, "id" | "number" | "title" | "status" | "sortOrder" | "projectKey"> & { pending?: boolean };
 
 // Issues under status headings, in workflow order. Used by the project page and the home page.
 export function IssueGroups({ rows }: { rows: IssueRow[] }) {

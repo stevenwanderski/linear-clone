@@ -5,17 +5,18 @@ import { getProject, listIssues } from "@/lib/issues";
 import { ListSkeleton } from "../../issue-groups";
 import { IssueList } from "./issue-list";
 
-async function ProjectIssues({ params }: { params: PageProps<"/p/[key]">["params"] }) {
+async function ProjectIssues({ params, searchParams }: Pick<PageProps<"/p/[key]">, "params" | "searchParams">) {
   await requireUser();
   const project = await getProject((await params).key);
   if (!project) notFound();
   const issues = await listIssues({ projectKey: project.key });
+  const view = (await searchParams).view === "board" ? "board" : "list";
 
-  return <IssueList project={{ key: project.key, name: project.name, color: project.color }} issues={issues} />;
+  return <IssueList project={{ key: project.key, name: project.name, color: project.color }} issues={issues} view={view} />;
 }
 
 // The project key comes from the URL, which is only known at request time, so the content streams in.
-export default function ProjectPage({ params }: PageProps<"/p/[key]">) {
+export default function ProjectPage({ params, searchParams }: PageProps<"/p/[key]">) {
   return (
     <main>
       <Suspense
@@ -26,7 +27,7 @@ export default function ProjectPage({ params }: PageProps<"/p/[key]">) {
           </>
         }
       >
-        <ProjectIssues params={params} />
+        <ProjectIssues params={params} searchParams={searchParams} />
       </Suspense>
     </main>
   );

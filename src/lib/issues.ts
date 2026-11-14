@@ -40,8 +40,8 @@ export const createIssueInput = z.object({
   status: issueFields.status.optional(),
 });
 
-// Every field optional: only the ones you pass get changed.
-export const updateIssueInput = z.object(issueFields).partial();
+// Every field optional: only the ones you pass get changed. sortOrder is the position within a status column.
+export const updateIssueInput = z.object({ ...issueFields, sortOrder: z.number().finite() }).partial();
 
 // Issue columns plus the project key (to show "WEB-42") and color.
 const issueWithKey = { ...getTableColumns(issues), projectKey: projects.key, projectColor: projects.color };
@@ -75,9 +75,9 @@ export async function createIssue(userId: string, input: z.input<typeof createIs
       WHERE key = ${projectKey}
       RETURNING id, issue_counter
     )
-    INSERT INTO ${issues} (project_id, number, title, description, status, creator_id)
+    INSERT INTO ${issues} (project_id, number, title, description, status, creator_id, sort_order)
     SELECT n.id, n.issue_counter, ${data.title}, ${data.description ?? ""},
-           ${data.status ?? "backlog"}::issue_status, ${userId}
+           ${data.status ?? "backlog"}::issue_status, ${userId}, n.issue_counter -- new issues go to the bottom of their column
     FROM n
     RETURNING id
   `);
