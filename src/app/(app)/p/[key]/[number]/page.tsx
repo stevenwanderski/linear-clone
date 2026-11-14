@@ -10,19 +10,21 @@ import { getIssue } from "@/lib/issues";
 import { IssueDescription } from "./issue-description";
 import { IssueFields, IssueTitle } from "./issue-fields";
 
-async function IssueDetail({ params }: { params: PageProps<"/p/[key]/[number]">["params"] }) {
+async function IssueDetail({ params, searchParams }: Pick<PageProps<"/p/[key]/[number]">, "params" | "searchParams">) {
   await requireUser();
   const { key, number } = await params;
   const issue = await getIssue(`${key}-${number}`);
   if (!issue) notFound();
   const issueRef = `${issue.projectKey}-${issue.number}`;
+  // Opened from the board (?view=board): the breadcrumb goes back to the board, not the list.
+  const fromBoard = (await searchParams).view === "board";
 
   return (
     <>
       <PageHeader
         title={
           <>
-            <Link href={`/p/${issue.projectKey}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+            <Link href={`/p/${issue.projectKey}${fromBoard ? "?view=board" : ""}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
               <ProjectBadge projectKey={issue.projectKey} color={issue.projectColor} />
               {issue.projectKey}
             </Link>
@@ -46,7 +48,7 @@ async function IssueDetail({ params }: { params: PageProps<"/p/[key]/[number]">[
 }
 
 // The ref comes from the URL, which is only known at request time, so the content streams in.
-export default function IssuePage({ params }: PageProps<"/p/[key]/[number]">) {
+export default function IssuePage({ params, searchParams }: PageProps<"/p/[key]/[number]">) {
   return (
     <main className="h-full">
       <Suspense
@@ -63,7 +65,7 @@ export default function IssuePage({ params }: PageProps<"/p/[key]/[number]">) {
           </div>
         }
       >
-        <IssueDetail params={params} />
+        <IssueDetail params={params} searchParams={searchParams} />
       </Suspense>
     </main>
   );

@@ -138,7 +138,7 @@ function Card({ row }: { row: IssueRow }) {
   return (
     <li ref={setNodeRef} style={style} className={cn(isDragging && "opacity-40")}>
       {/* The link is the drag handle too. draggable={false} stops the browser's own link dragging from taking over. */}
-      <Link href={`/p/${row.projectKey}/${row.number}`} draggable={false} {...attributes} {...listeners} role="link" className="block rounded-md">
+      <Link href={`/p/${row.projectKey}/${row.number}?view=board`} draggable={false} {...attributes} {...listeners} role="link" className="block rounded-md">
         <CardBody row={row} className="hover:bg-muted/60" />
       </Link>
     </li>
