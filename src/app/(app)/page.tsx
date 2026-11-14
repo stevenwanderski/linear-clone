@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { SignOutButton } from "./sign-out-button";
 
 // Temporary home page. Replaced by "My issues" in card 15.
 async function CurrentUser() {
@@ -10,7 +9,7 @@ async function CurrentUser() {
   if (!session) return <Link className="underline" href="/login">Sign in</Link>;
   return (
     <p>
-      Signed in as {session.user.name} ({session.user.email}) · <SignOutButton />
+      Signed in as {session.user.name} ({session.user.email})
     </p>
   );
 }

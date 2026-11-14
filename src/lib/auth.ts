@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { betterAuth } from "better-auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -39,8 +40,9 @@ export const auth = betterAuth({
 
 // For pages and server actions: the signed-in user, or a redirect to /login.
 // The proxy only checks that a cookie exists; this checks it's a real session.
-export async function requireUser() {
+// cache() runs it once per request, so the sidebar and the page share one session lookup.
+export const requireUser = cache(async () => {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
   return session.user;
-}
+});
