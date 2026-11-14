@@ -1,13 +1,11 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { ListTodoIcon } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Skeleton } from "@/components/ui/skeleton";
 import { requireUser } from "@/lib/auth";
 import { listProjects } from "@/lib/issues";
 import { AccountMenu } from "./account-menu";
-import { NavLink } from "./nav-link";
 import { SidebarProjects } from "./sidebar-projects";
 
 async function ProjectList() {
@@ -32,10 +30,6 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
           </Link>
           <ThemeToggle />
         </div>
-        <NavLink href="/" exact>
-          <ListTodoIcon className="size-4" />
-          Open issues
-        </NavLink>
         {/* Reads the session and the DB at request time, so it streams in behind a boundary. */}
         <Suspense
           fallback={

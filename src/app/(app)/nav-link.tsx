@@ -5,9 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-type Props = { href: string; exact?: boolean; children: React.ReactNode };
+type Props = { href: string; children: React.ReactNode };
 
-// A sidebar link that highlights while you're on its page (or, unless `exact`, any page under it).
+// A sidebar link that highlights while you're on its page or any page under it.
 // The current URL is request-time data, so the highlight streams in behind Suspense; until then it's a plain link.
 export function NavLink(props: Props) {
   return (
@@ -19,7 +19,7 @@ export function NavLink(props: Props) {
 
 function ActiveNavLink(props: Props) {
   const pathname = usePathname();
-  const active = props.exact ? pathname === props.href : pathname === props.href || pathname.startsWith(`${props.href}/`);
+  const active = pathname === props.href || pathname.startsWith(`${props.href}/`);
   return <StyledLink {...props} active={active} />;
 }
 
