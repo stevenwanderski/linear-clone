@@ -8,20 +8,21 @@ import { NavLink } from "./nav-link";
 import { NewProjectDialog } from "./new-project-dialog";
 
 type Project = { id: string; key: string; name: string; color?: string | null; pending?: boolean };
+type NewProject = { name: string; key: string; color?: string };
 
 export function SidebarProjects({ projects }: { projects: Project[] }) {
   // A new project shows at once, dimmed. When the save finishes, React swaps in the real list.
-  const [shown, addProject] = useOptimistic<Project[], { name: string; key: string }>(projects, (current, p) =>
-    [...current, { id: `pending-${p.key}`, key: p.key.toUpperCase(), name: p.name, pending: true }].sort((a, b) =>
+  const [shown, addProject] = useOptimistic<Project[], NewProject>(projects, (current, p) =>
+    [...current, { id: `pending-${p.key}`, key: p.key.toUpperCase(), name: p.name, color: p.color, pending: true }].sort((a, b) =>
       a.name.localeCompare(b.name),
     ),
   );
 
   // Runs inside the form's action, which React already wraps in a transition, so addProject is allowed here.
-  async function create(name: string, key: string) {
-    addProject({ name, key });
+  async function create(project: NewProject) {
+    addProject(project);
     try {
-      const { error } = await createProjectAction(name, key);
+      const { error } = await createProjectAction(project);
       if (error) toast.error(error);
     } catch {
       toast.error("Couldn't create the project. Try again.");

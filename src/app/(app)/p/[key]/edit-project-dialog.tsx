@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { projectColors } from "@/lib/labels";
+import { ColorPicker } from "@/components/color-picker";
 
 // Rename a project or change its color. The key is shown but can't change: it's part of every issue ref and URL.
 export function EditProjectDialog({ project }: { project: { key: string; name: string; color: string | null } }) {
@@ -48,28 +48,7 @@ export function EditProjectDialog({ project }: { project: { key: string; name: s
             <Label htmlFor="project-name">Name</Label>
             <Input id="project-name" name="name" defaultValue={project.name} required maxLength={100} autoFocus autoComplete="off" data-1p-ignore />
           </div>
-          <fieldset className="grid gap-2">
-            <legend className="mb-2 text-sm font-medium">Color</legend>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(projectColors).map(([name, hex]) => (
-                <label key={name} className="relative">
-                  {/* A real radio under each swatch, so keyboard and screen readers work. */}
-                  <input
-                    type="radio"
-                    name="color"
-                    value={name}
-                    defaultChecked={project.color === name}
-                    aria-label={name}
-                    className="peer sr-only"
-                  />
-                  <span
-                    className="block size-6 cursor-pointer rounded-full ring-offset-2 ring-offset-background peer-checked:ring-2 peer-checked:ring-foreground peer-focus-visible:ring-2 peer-focus-visible:ring-ring"
-                    style={{ background: hex }}
-                  />
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <ColorPicker defaultValue={project.color} />
           <div className="grid gap-2">
             <Label htmlFor="project-key">Key</Label>
             <Input id="project-key" value={project.key} disabled />

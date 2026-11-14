@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ColorPicker } from "@/components/color-picker";
 
 // Closes as soon as you submit: the parent shows the project right away and reports any error as a toast.
-export function NewProjectDialog({ onCreate }: { onCreate: (name: string, key: string) => Promise<void> }) {
+export function NewProjectDialog({ onCreate }: { onCreate: (project: { name: string; key: string; color?: string }) => Promise<void> }) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -20,7 +21,11 @@ export function NewProjectDialog({ onCreate }: { onCreate: (name: string, key: s
           // Closing here, not in the action: state set inside an action waits until the action finishes.
           onSubmit={() => setOpen(false)}
           action={async (formData) => {
-            await onCreate(String(formData.get("name")), String(formData.get("key")));
+            await onCreate({
+              name: String(formData.get("name")),
+              key: String(formData.get("key")),
+              color: formData.get("color") ? String(formData.get("color")) : undefined,
+            });
           }}
           className="grid gap-4"
         >
@@ -41,6 +46,7 @@ export function NewProjectDialog({ onCreate }: { onCreate: (name: string, key: s
               className="uppercase"
             />
           </div>
+          <ColorPicker />
           <DialogFooter>
             <Button type="submit">Create project</Button>
           </DialogFooter>

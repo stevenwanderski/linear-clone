@@ -27,12 +27,11 @@ export const createProjectInput = z.object({
   key: projectKey,
   name: z.string().trim().min(1, "Name is required").max(100),
   description: z.string().optional(),
+  color: z.enum(Object.keys(projectColors) as [ProjectColor, ...ProjectColor[]]).optional(),
 });
 
 // The key stays fixed: it is part of every issue ref and URL.
-export const updateProjectInput = createProjectInput
-  .pick({ name: true })
-  .extend({ color: z.enum(Object.keys(projectColors) as [ProjectColor, ...ProjectColor[]]).optional() });
+export const updateProjectInput = createProjectInput.pick({ name: true, color: true });
 
 export const createIssueInput = z.object({
   projectKey,

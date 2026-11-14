@@ -4,9 +4,9 @@ import { refresh } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import { createProject, createProjectInput, updateProject, updateProjectInput } from "@/lib/issues";
 
-export async function createProjectAction(name: string, key: string): Promise<{ error?: string }> {
+export async function createProjectAction(fields: { name: string; key: string; color?: string }): Promise<{ error?: string }> {
   await requireUser();
-  const input = createProjectInput.safeParse({ name, key });
+  const input = createProjectInput.safeParse(fields);
   if (!input.success) return { error: input.error.issues[0].message };
 
   const project = await createProject(input.data);
