@@ -18,7 +18,7 @@ export default function LoginPage({ searchParams }: { searchParams: SearchParams
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-sidebar p-6">
       <Logo className="size-12" />
       <div className="text-center">
-        <h1 className="text-xl font-semibold">Welcome to Happy Linear</h1>
+        <h1 className="text-xl font-semibold">Welcome to Linear Lite</h1>
         <p className="mt-1 text-sm text-muted-foreground">Projects and issues, without the noise.</p>
       </div>
       <Button

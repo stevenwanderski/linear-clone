@@ -1,4 +1,4 @@
-// The Happy Linear mark: six rounded diagonal strokes that stop short of a circle's edge, so together they
+// The Linear Lite mark: six rounded diagonal strokes that stop short of a circle's edge, so together they
 // read as a circle. One colour (currentColor), so it follows the text colour in light and dark mode.
 const R = 14; // radius of the circle the strokes fit inside
 const strokes = Array.from({ length: 6 }, (_, i) => {

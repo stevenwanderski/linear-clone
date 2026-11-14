@@ -1,4 +1,4 @@
-# Happy Linear
+# Linear Lite
 
 A small Linear clone: projects + issues, keyboard-driven UI, and an MCP server so Claude can manage issues. Next.js on Netlify, Neon Postgres, Drizzle, Better Auth.
 

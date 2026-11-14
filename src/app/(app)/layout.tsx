@@ -28,7 +28,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         <div className="mb-3 flex items-center justify-between pl-1">
           <Link href="/" className="flex items-center gap-2 text-[13px] font-semibold">
             <Logo className="size-5" />
-            Happy Linear
+            Linear Lite
           </Link>
           <ThemeToggle />
         </div>

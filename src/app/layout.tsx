@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Happy Linear",
+  title: "Linear Lite",
   description: "Projects and issues, Linear-style.",
 };
 
