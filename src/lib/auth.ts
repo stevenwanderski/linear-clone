@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { apiKey } from "@better-auth/api-key";
 import { betterAuth } from "better-auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -21,6 +22,13 @@ export const auth = betterAuth({
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     },
   },
+  plugins: [
+    apiKey({
+      defaultPrefix: "ll_", // makes Linear Lite keys easy to spot
+      // The default (10 requests a day) would block the MCP server, which checks the key on every call.
+      rateLimit: { enabled: false },
+    }),
+  ],
   databaseHooks: {
     // Returning false cancels the write, so the sign-in fails.
     user: {
