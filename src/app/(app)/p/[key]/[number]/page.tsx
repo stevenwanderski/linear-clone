@@ -6,7 +6,7 @@ import { PageHeader } from "@/components/page-header";
 import { ProjectBadge } from "@/components/project-badge";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { getIssue, listUsers } from "@/lib/issues";
+import { getIssue } from "@/lib/issues";
 import { IssueDescription } from "./issue-description";
 import { IssueFields, IssueTitle } from "./issue-fields";
 
@@ -15,7 +15,6 @@ async function IssueDetail({ params }: { params: PageProps<"/p/[key]/[number]">[
   const { key, number } = await params;
   const issue = await getIssue(`${key}-${number}`);
   if (!issue) notFound();
-  const users = await listUsers();
   const issueRef = `${issue.projectKey}-${issue.number}`;
 
   return (
@@ -39,12 +38,7 @@ async function IssueDetail({ params }: { params: PageProps<"/p/[key]/[number]">[
         </article>
         <aside className="w-72 shrink-0 border-l p-4">
           <h2 className="mb-3 px-2 text-xs font-medium text-muted-foreground">Properties</h2>
-          <IssueFields
-            issueRef={issueRef}
-            status={issue.status}
-            assigneeId={issue.assigneeId}
-            users={users}
-          />
+<IssueFields issueRef={issueRef} status={issue.status} />
         </aside>
       </div>
     </>

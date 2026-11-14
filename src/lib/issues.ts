@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { and, asc, eq, getTableColumns, notInArray, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { issues, issueStatus, projects, user } from "@/db/schema";
+import { issues, issueStatus, projects } from "@/db/schema";
 import { projectColors, type ProjectColor } from "./labels";
 
 // "WEB-42" (any case, extra spaces ok) -> { key: "WEB", number: 42 }. Returns null if it isn't a ref.
@@ -21,7 +21,6 @@ const issueFields = {
   title: z.string().trim().min(1, "Title is required").max(200),
   description: z.string(),
   status: z.enum(issueStatus.enumValues),
-  assigneeId: z.string().nullable(),
 };
 
 export const createProjectInput = z.object({
@@ -40,7 +39,6 @@ export const createIssueInput = z.object({
   ...issueFields,
   description: issueFields.description.optional(),
   status: issueFields.status.optional(),
-  assigneeId: issueFields.assigneeId.optional(),
 });
 
 // Every field optional: only the ones you pass get changed.
@@ -78,9 +76,9 @@ export async function createIssue(userId: string, input: z.input<typeof createIs
       WHERE key = ${projectKey}
       RETURNING id, issue_counter
     )
-    INSERT INTO ${issues} (project_id, number, title, description, status, assignee_id, creator_id)
+    INSERT INTO ${issues} (project_id, number, title, description, status, creator_id)
     SELECT n.id, n.issue_counter, ${data.title}, ${data.description ?? ""},
-           ${data.status ?? "backlog"}::issue_status, ${data.assigneeId ?? null}, ${userId}
+           ${data.status ?? "backlog"}::issue_status, ${userId}
     FROM n
     RETURNING id
   `);
@@ -121,7 +119,7 @@ export async function updateIssue(ref: string, input: z.input<typeof updateIssue
 
 // `openOnly` leaves out Done and Canceled.
 export async function listIssues(
-  filter: { projectKey?: string; status?: string; assigneeId?: string; openOnly?: boolean } = {},
+  filter: { projectKey?: string; status?: string; openOnly?: boolean } = {},
 ) {
   const status = filter.status === undefined ? undefined : issueFields.status.parse(filter.status);
   return db
@@ -132,7 +130,6 @@ export async function listIssues(
       and(
         filter.projectKey ? eq(projects.key, filter.projectKey.toUpperCase()) : undefined,
         status ? eq(issues.status, status) : undefined,
-        filter.assigneeId ? eq(issues.assigneeId, filter.assigneeId) : undefined,
         filter.openOnly ? notInArray(issues.status, ["done", "canceled"]) : undefined,
       ),
     )
@@ -150,9 +147,4 @@ export async function listProjects() {
 export async function getProject(key: string) {
   const [project] = await db.select().from(projects).where(eq(projects.key, key.toUpperCase()));
   return project ?? null;
-}
-
-// Everyone who can be assigned an issue (only allowlisted emails can sign in).
-export async function listUsers() {
-  return db.select({ id: user.id, name: user.name }).from(user).orderBy(asc(user.name));
 }

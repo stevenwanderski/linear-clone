@@ -68,15 +68,12 @@ export function IssueTitle({ issueRef, title }: { issueRef: string; title: strin
 export function IssueFields(props: {
   issueRef: string;
   status: string;
-  assigneeId: string | null;
-  users: { id: string; name: string }[];
 }) {
   const [shown, showNow] = useOptimistic(
-    { status: props.status, assigneeId: props.assigneeId },
+    { status: props.status },
     (current, changes: Changes) => ({ ...current, ...changes }),
   );
   const { pending, save } = useSave(props.issueRef, showNow);
-  const userItems = [{ value: null, label: "Unassigned" }, ...props.users.map((u) => ({ value: u.id, label: u.name }))];
 
   return (
     <dl className="grid grid-cols-[4.5rem_1fr] items-center gap-x-2 gap-y-1 text-[13px]" aria-busy={pending}>
@@ -86,15 +83,6 @@ export function IssueFields(props: {
           <SelectTrigger size="sm" className={trigger} aria-label="Status"><SelectValue /></SelectTrigger>
           <SelectContent>
             {statusItems.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </dd>
-      <dt className="px-2 text-muted-foreground">Assignee</dt>
-      <dd>
-        <Select items={userItems} value={shown.assigneeId} onValueChange={(assigneeId) => save({ assigneeId })}>
-          <SelectTrigger size="sm" className={trigger} aria-label="Assignee"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            {userItems.map((item) => <SelectItem key={item.value ?? "none"} value={item.value}>{item.label}</SelectItem>)}
           </SelectContent>
         </Select>
       </dd>

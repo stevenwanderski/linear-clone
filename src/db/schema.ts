@@ -132,7 +132,6 @@ export const issues = pgTable(
     title: text("title").notNull(),
     description: text("description").default("").notNull(),
     status: issueStatus("status").default("backlog").notNull(),
-    assigneeId: text("assignee_id").references(() => user.id, { onDelete: "set null" }),
     creatorId: text("creator_id")
       .notNull()
       .references(() => user.id),

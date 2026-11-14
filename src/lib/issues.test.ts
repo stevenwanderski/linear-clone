@@ -44,10 +44,6 @@ describe("updateIssueInput", () => {
   it("keeps only the fields passed", () => {
     expect(updateIssueInput.parse({ status: "done" })).toEqual({ status: "done" });
   });
-
-  it("allows clearing the assignee", () => {
-    expect(updateIssueInput.parse({ assigneeId: null })).toEqual({ assigneeId: null });
-  });
 });
 
 describe("updateProjectInput", () => {
