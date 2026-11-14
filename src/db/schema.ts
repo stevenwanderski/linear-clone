@@ -116,6 +116,7 @@ export const projects = pgTable("projects", {
   key: text("key").notNull().unique(), // "WEB", used in issue IDs like WEB-42
   name: text("name").notNull(),
   description: text("description"),
+  color: text("color"), // a name from projectColors in src/lib/labels.ts; null = picked from the key
   issueCounter: integer("issue_counter").default(0).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });

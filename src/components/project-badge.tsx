@@ -1,13 +1,11 @@
-// A small coloured square with the project key's first letter. The hue comes from the key, so each project keeps its colour.
-export function ProjectBadge({ projectKey }: { projectKey: string }) {
-  const hue = [...projectKey].reduce((sum, ch) => sum + ch.charCodeAt(0) * 37, 0) % 360;
-  return (
-    <span
-      aria-hidden="true"
-      className="grid size-4 shrink-0 place-items-center rounded text-[9px] font-semibold text-white"
-      style={{ background: `oklch(0.62 0.15 ${hue})` }}
-    >
-      {projectKey.charAt(0)}
-    </span>
-  );
+import { BoxIcon } from "lucide-react";
+import { projectColors, type ProjectColor } from "@/lib/labels";
+
+const names = Object.keys(projectColors) as ProjectColor[];
+
+// A cube in the project's colour. Projects that never picked one get a colour from their key, so it stays the same.
+export function ProjectBadge({ projectKey, color }: { projectKey: string; color?: string | null }) {
+  const fallback = names[[...projectKey].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % names.length];
+  const hex = projectColors[(color as ProjectColor) ?? fallback] ?? projectColors[fallback];
+  return <BoxIcon aria-hidden="true" className="size-4 shrink-0" style={{ color: hex }} />;
 }

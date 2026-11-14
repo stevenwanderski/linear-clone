@@ -11,7 +11,7 @@ async function ProjectIssues({ params }: { params: PageProps<"/p/[key]">["params
   if (!project) notFound();
   const issues = await listIssues({ projectKey: project.key });
 
-  return <IssueList project={{ key: project.key, name: project.name }} issues={issues} />;
+  return <IssueList project={{ key: project.key, name: project.name, color: project.color }} issues={issues} />;
 }
 
 // The project key comes from the URL, which is only known at request time, so the content streams in.

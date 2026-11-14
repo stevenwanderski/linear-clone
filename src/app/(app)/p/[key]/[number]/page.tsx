@@ -24,7 +24,7 @@ async function IssueDetail({ params }: { params: PageProps<"/p/[key]/[number]">[
         title={
           <>
             <Link href={`/p/${issue.projectKey}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
-              <ProjectBadge projectKey={issue.projectKey} />
+              <ProjectBadge projectKey={issue.projectKey} color={issue.projectColor} />
               {issue.projectKey}
             </Link>
             <ChevronRightIcon className="size-3.5 text-muted-foreground" />

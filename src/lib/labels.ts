@@ -9,3 +9,18 @@ export const statusLabels: Record<(typeof issueStatus.enumValues)[number], strin
   canceled: "Canceled",
 };
 
+
+// Project colours, stored by name. Each one reads on both light and dark backgrounds.
+export const projectColors = {
+  gray: "#94a0b0",
+  red: "#e5484d",
+  orange: "#f0883e",
+  yellow: "#e2b93b",
+  green: "#3fb57a",
+  teal: "#22b0c4",
+  blue: "#4a9cf5",
+  indigo: "#6670db",
+  purple: "#9a5ae0",
+  pink: "#de5aa0",
+};
+export type ProjectColor = keyof typeof projectColors;

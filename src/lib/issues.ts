@@ -2,6 +2,7 @@ import { z } from "zod";
 import { and, asc, eq, getTableColumns, notInArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { issues, issueStatus, projects, user } from "@/db/schema";
+import { projectColors, type ProjectColor } from "./labels";
 
 // "WEB-42" (any case, extra spaces ok) -> { key: "WEB", number: 42 }. Returns null if it isn't a ref.
 export function parseRef(ref: string) {
@@ -29,6 +30,11 @@ export const createProjectInput = z.object({
   description: z.string().optional(),
 });
 
+// The key stays fixed: it is part of every issue ref and URL.
+export const updateProjectInput = createProjectInput
+  .pick({ name: true })
+  .extend({ color: z.enum(Object.keys(projectColors) as [ProjectColor, ...ProjectColor[]]).optional() });
+
 export const createIssueInput = z.object({
   projectKey,
   ...issueFields,
@@ -40,8 +46,8 @@ export const createIssueInput = z.object({
 // Every field optional: only the ones you pass get changed.
 export const updateIssueInput = z.object(issueFields).partial();
 
-// Issue columns plus the project key, so callers can show "WEB-42".
-const issueWithKey = { ...getTableColumns(issues), projectKey: projects.key };
+// Issue columns plus the project key (to show "WEB-42") and colour.
+const issueWithKey = { ...getTableColumns(issues), projectKey: projects.key, projectColor: projects.color };
 
 // The project id for a key, as a subquery: lets one statement work by "WEB" instead of a UUID.
 const projectIdFor = (key: string) =>
@@ -51,6 +57,13 @@ const projectIdFor = (key: string) =>
 export async function createProject(input: z.input<typeof createProjectInput>) {
   const data = createProjectInput.parse(input);
   const [project] = await db.insert(projects).values(data).onConflictDoNothing({ target: projects.key }).returning();
+  return project ?? null;
+}
+
+// Returns null if no project has that key.
+export async function updateProject(key: string, input: z.input<typeof updateProjectInput>) {
+  const data = updateProjectInput.parse(input);
+  const [project] = await db.update(projects).set(data).where(eq(projects.key, key.toUpperCase())).returning();
   return project ?? null;
 }
 
@@ -128,7 +141,7 @@ export async function listIssues(
 
 export async function listProjects() {
   return db
-    .select({ id: projects.id, key: projects.key, name: projects.name })
+    .select({ id: projects.id, key: projects.key, name: projects.name, color: projects.color })
     .from(projects)
     .orderBy(asc(projects.name));
 }

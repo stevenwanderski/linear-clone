@@ -7,7 +7,7 @@ import { ProjectBadge } from "@/components/project-badge";
 import { NavLink } from "./nav-link";
 import { NewProjectDialog } from "./new-project-dialog";
 
-type Project = { id: string; key: string; name: string; pending?: boolean };
+type Project = { id: string; key: string; name: string; color?: string | null; pending?: boolean };
 
 export function SidebarProjects({ projects }: { projects: Project[] }) {
   // A new project shows at once, dimmed. When the save finishes, React swaps in the real list.
@@ -39,7 +39,7 @@ export function SidebarProjects({ projects }: { projects: Project[] }) {
         {shown.map((p) => {
           const content = (
             <>
-              <ProjectBadge projectKey={p.key} />
+              <ProjectBadge projectKey={p.key} color={p.color} />
               <span className="truncate">{p.name}</span>
             </>
           );

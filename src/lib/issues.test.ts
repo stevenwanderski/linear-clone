@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createIssueInput, createProjectInput, parseRef, updateIssueInput } from "./issues";
+import { createIssueInput, createProjectInput, parseRef, updateIssueInput, updateProjectInput } from "./issues";
 
 describe("parseRef", () => {
   it("parses a ref, ignoring case and spaces", () => {
@@ -47,5 +47,17 @@ describe("updateIssueInput", () => {
 
   it("allows clearing the assignee", () => {
     expect(updateIssueInput.parse({ assigneeId: null })).toEqual({ assigneeId: null });
+  });
+});
+
+describe("updateProjectInput", () => {
+  it("trims the name, rejects an empty one, and ignores the key", () => {
+    expect(updateProjectInput.parse({ name: " Site ", key: "NEW" })).toEqual({ name: "Site" });
+    expect(updateProjectInput.safeParse({ name: "  " }).success).toBe(false);
+  });
+
+  it("accepts palette colours only", () => {
+    expect(updateProjectInput.parse({ name: "Site", color: "blue" }).color).toBe("blue");
+    expect(updateProjectInput.safeParse({ name: "Site", color: "#ff0000" }).success).toBe(false);
   });
 });
