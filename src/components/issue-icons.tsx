@@ -27,16 +27,16 @@ export function StatusIcon({ status }: { status: Status }) {
       );
     case "done":
       return (
-        <svg {...common} className={`${common.className} text-primary`}>
+        <svg {...common} className={`${common.className} text-violet-500`}>
           <circle cx="7" cy="7" r="7" fill="currentColor" />
-          <path d="m4.3 7.2 1.8 1.8 3.6-3.8" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="m4.3 7.2 1.8 1.8 3.6-3.8" fill="none" stroke="#18181b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       );
     case "canceled":
       return (
         <svg {...common} className={`${common.className} text-muted-foreground`}>
           <circle cx="7" cy="7" r="7" fill="currentColor" />
-          <path d="m4.8 4.8 4.4 4.4m0-4.4-4.4 4.4" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="m4.8 4.8 4.4 4.4m0-4.4-4.4 4.4" stroke="#18181b" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
       );
   }
