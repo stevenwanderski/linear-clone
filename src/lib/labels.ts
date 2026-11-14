@@ -10,7 +10,7 @@ export const statusLabels: Record<(typeof issueStatus.enumValues)[number], strin
 };
 
 
-// Project colours, stored by name. Each one reads on both light and dark backgrounds.
+// Project colors, stored by name. Each one reads on both light and dark backgrounds.
 export const projectColors = {
   gray: "#94a0b0",
   red: "#e5484d",

@@ -52,7 +52,7 @@ describe("updateProjectInput", () => {
     expect(updateProjectInput.safeParse({ name: "  " }).success).toBe(false);
   });
 
-  it("accepts palette colours only", () => {
+  it("accepts palette colors only", () => {
     expect(updateProjectInput.parse({ name: "Site", color: "blue" }).color).toBe("blue");
     expect(updateProjectInput.safeParse({ name: "Site", color: "#ff0000" }).success).toBe(false);
   });

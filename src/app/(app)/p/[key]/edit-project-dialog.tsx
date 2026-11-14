@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { projectColors } from "@/lib/labels";
 
-// Rename a project or change its colour. The key is shown but can't change: it's part of every issue ref and URL.
+// Rename a project or change its color. The key is shown but can't change: it's part of every issue ref and URL.
 export function EditProjectDialog({ project }: { project: { key: string; name: string; color: string | null } }) {
   const [open, setOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -46,10 +46,10 @@ export function EditProjectDialog({ project }: { project: { key: string; name: s
         <form action={save} className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="project-name">Name</Label>
-            <Input id="project-name" name="name" defaultValue={project.name} required maxLength={100} autoFocus />
+            <Input id="project-name" name="name" defaultValue={project.name} required maxLength={100} autoFocus autoComplete="off" data-1p-ignore />
           </div>
           <fieldset className="grid gap-2">
-            <legend className="mb-2 text-sm font-medium">Colour</legend>
+            <legend className="mb-2 text-sm font-medium">Color</legend>
             <div className="flex flex-wrap gap-2">
               {Object.entries(projectColors).map(([name, hex]) => (
                 <label key={name} className="relative">

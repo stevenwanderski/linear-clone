@@ -2,7 +2,7 @@ import type { issueStatus } from "@/db/schema";
 
 type Status = (typeof issueStatus.enumValues)[number];
 
-// Small 14px icons for issue status. Colours come from `currentColor` via text-* classes.
+// Small 14px icons for issue status. Colors come from `currentColor` via text-* classes.
 export function StatusIcon({ status }: { status: Status }) {
   const common = { viewBox: "0 0 14 14", className: "size-3.5 shrink-0", "aria-hidden": true } as const;
   switch (status) {

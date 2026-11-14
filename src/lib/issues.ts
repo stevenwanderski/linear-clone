@@ -44,7 +44,7 @@ export const createIssueInput = z.object({
 // Every field optional: only the ones you pass get changed.
 export const updateIssueInput = z.object(issueFields).partial();
 
-// Issue columns plus the project key (to show "WEB-42") and colour.
+// Issue columns plus the project key (to show "WEB-42") and color.
 const issueWithKey = { ...getTableColumns(issues), projectKey: projects.key, projectColor: projects.color };
 
 // The project id for a key, as a subquery: lets one statement work by "WEB" instead of a UUID.

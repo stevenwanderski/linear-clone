@@ -26,7 +26,7 @@ export function NewProjectDialog({ onCreate }: { onCreate: (name: string, key: s
         >
           <div className="grid gap-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" name="name" placeholder="Website" required maxLength={100} autoFocus />
+            <Input id="name" name="name" placeholder="Website" required maxLength={100} autoFocus autoComplete="off" data-1p-ignore />
           </div>
           <div className="grid gap-2">
             <Label htmlFor="key">Key</Label>
