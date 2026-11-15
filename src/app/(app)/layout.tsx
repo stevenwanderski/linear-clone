@@ -10,8 +10,8 @@ import { AccountMenu } from "./account-menu";
 import { SidebarProjects } from "./sidebar-projects";
 
 async function ProjectList() {
-  await requireUser();
-  return <SidebarProjects projects={await listProjects()} />;
+  const user = await requireUser();
+  return <SidebarProjects projects={await listProjects(user.id)} />;
 }
 
 async function Account() {

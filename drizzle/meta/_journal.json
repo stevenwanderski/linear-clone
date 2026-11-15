@@ -50,6 +50,13 @@
       "when": 1794665467065,
       "tag": "0006_careless_human_torch",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794769210354,
+      "tag": "0007_scope_projects_to_owner",
+      "breakpoints": true
     }
   ]
 }

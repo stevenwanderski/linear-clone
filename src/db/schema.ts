@@ -146,15 +146,23 @@ export const issueStatus = pgEnum("issue_status", [
   "canceled",
 ]);
 
-export const projects = pgTable("projects", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  key: text("key").notNull().unique(), // "WEB", used in issue IDs like WEB-42
-  name: text("name").notNull(),
-  description: text("description"),
-  color: text("color"), // a name from projectColors in src/lib/labels.ts; null = picked from the key
-  issueCounter: integer("issue_counter").default(0).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
+// Each project belongs to one user, and its issues come with it: nobody else can see or change them.
+export const projects = pgTable(
+  "projects",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerId: text("owner_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    key: text("key").notNull(), // "WEB", used in issue IDs like WEB-42; unique per owner
+    name: text("name").notNull(),
+    description: text("description"),
+    color: text("color"), // a name from projectColors in src/lib/labels.ts; null = picked from the key
+    issueCounter: integer("issue_counter").default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [unique("projects_owner_key_unique").on(table.ownerId, table.key)],
+);
 
 export const issues = pgTable(
   "issues",

@@ -6,10 +6,10 @@ import { ListSkeleton } from "../../issue-groups";
 import { IssueList } from "./issue-list";
 
 async function ProjectIssues({ params, searchParams }: Pick<PageProps<"/p/[key]">, "params" | "searchParams">) {
-  await requireUser();
-  const project = await getProject((await params).key);
+  const user = await requireUser();
+  const project = await getProject(user.id, (await params).key);
   if (!project) notFound();
-  const issues = await listIssues({ projectKey: project.key });
+  const issues = await listIssues(user.id, { projectKey: project.key });
   const view = (await searchParams).view === "board" ? "board" : "list";
 
   return <IssueList project={{ key: project.key, name: project.name, color: project.color }} issues={issues} view={view} />;

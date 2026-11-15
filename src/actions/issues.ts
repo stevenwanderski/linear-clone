@@ -20,12 +20,12 @@ export async function createIssueAction(
 
 // Changes are validated inside updateIssue, since anything can reach a server action.
 export async function updateIssueAction(ref: string, changes: z.input<typeof updateIssueInput>) {
-  await requireUser();
-  await updateIssue(ref, changes);
+  const user = await requireUser();
+  await updateIssue(user.id, ref, changes);
   refresh();
 }
 
 export async function deleteIssueAction(ref: string) {
-  await requireUser();
-  await deleteIssue(ref);
+  const user = await requireUser();
+  await deleteIssue(user.id, ref);
 }

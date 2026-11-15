@@ -34,12 +34,20 @@ const summary = (issue: NonNullable<Awaited<ReturnType<typeof getIssue>>>) => ({
   status: issue.status,
 });
 
+// The owner of the API key this request came with (verifyKey below puts it there). Every tool works on
+// that user's projects only. Throws rather than guess, though withMcpAuth already refuses requests without a key.
+function userOf(ctx: { http?: { authInfo?: { extra?: Record<string, unknown> } } }) {
+  const userId = ctx.http?.authInfo?.extra?.userId;
+  if (typeof userId !== "string") throw new Error("Not signed in");
+  return userId;
+}
+
 const handler = createMcpHandler(
   (server) => {
     server.registerTool(
       "list_projects",
       { title: "List projects", description: "Every project, with the key used in its issue refs." },
-      async () => text(await listProjects().then((rows) => rows.map(({ key, name, color }) => ({ key, name, color })))),
+      async (ctx) => text(await listProjects(userOf(ctx)).then((rows) => rows.map(({ key, name, color }) => ({ key, name, color })))),
     );
 
     server.registerTool(
@@ -53,15 +61,15 @@ const handler = createMcpHandler(
           open_only: z.boolean().optional().describe("Leave out done and canceled issues"),
         }),
       },
-      async ({ project, status, open_only }) =>
-        text((await listIssues({ projectKey: project, status, openOnly: open_only })).map(summary)),
+      async ({ project, status, open_only }, ctx) =>
+        text((await listIssues(userOf(ctx), { projectKey: project, status, openOnly: open_only })).map(summary)),
     );
 
     server.registerTool(
       "get_issue",
       { title: "Get issue", description: "One issue, including its markdown description.", inputSchema: z.object({ ref }) },
-      async ({ ref }) => {
-        const issue = await getIssue(ref);
+      async ({ ref }, ctx) => {
+        const issue = await getIssue(userOf(ctx), ref);
         if (!issue) return error(`No issue ${ref}`);
         return text({ ...summary(issue), description: issue.description, createdAt: issue.createdAt, updatedAt: issue.updatedAt });
       },
@@ -79,10 +87,9 @@ const handler = createMcpHandler(
           status: status.optional().describe("Defaults to backlog"),
         }),
       },
-      friendly(async ({ project, title, description, status }, ctx) => {
-        const userId = ctx.http?.authInfo?.extra?.userId as string; // set by verifyKey below
-        return text(summary(await createIssue(userId, { projectKey: project, title, description, status })));
-      }),
+      friendly(async ({ project, title, description, status }, ctx) =>
+        text(summary(await createIssue(userOf(ctx), { projectKey: project, title, description, status }))),
+      ),
     );
 
     server.registerTool(
@@ -97,8 +104,8 @@ const handler = createMcpHandler(
           status: status.optional(),
         }),
       },
-      friendly(async ({ ref, ...changes }) => {
-        const issue = await updateIssue(ref, changes);
+      friendly(async ({ ref, ...changes }, ctx) => {
+        const issue = await updateIssue(userOf(ctx), ref, changes);
         if (!issue) return error(`No issue ${ref}`);
         return text(summary(issue));
       }),
@@ -111,7 +118,7 @@ const handler = createMcpHandler(
         description: "Permanently delete an issue. This can't be undone; to just close it, set status to canceled.",
         inputSchema: z.object({ ref }),
       },
-      async ({ ref }) => ((await deleteIssue(ref)) ? text({ deleted: ref }) : error(`No issue ${ref}`)),
+      async ({ ref }, ctx) => ((await deleteIssue(userOf(ctx), ref)) ? text({ deleted: ref }) : error(`No issue ${ref}`)),
     );
 
     server.registerTool(
@@ -128,8 +135,8 @@ const handler = createMcpHandler(
             .describe("Defaults to a color picked from the key"),
         }),
       },
-      friendly(async (input) => {
-        const project = await createProject(input);
+      friendly(async (input, ctx) => {
+        const project = await createProject(userOf(ctx), input);
         if (!project) return error(`Key ${input.key.trim().toUpperCase()} is already taken`);
         return text({ key: project.key, name: project.name, color: project.color });
       }),

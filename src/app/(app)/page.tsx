@@ -5,13 +5,13 @@ import { listIssues } from "@/lib/issues";
 import { EmptyState, IssueGroups, ListSkeleton } from "./issue-groups";
 
 async function OpenIssues() {
-  await requireUser();
-  const issues = await listIssues({ openOnly: true });
+  const user = await requireUser();
+  const issues = await listIssues(user.id, { openOnly: true });
   if (issues.length === 0) return <EmptyState>No open issues. Everything is done.</EmptyState>;
   return <IssueGroups rows={issues} />;
 }
 
-// Every open issue across all projects. Login lands here.
+// Every open issue across your projects. Login lands here.
 export default function Home() {
   return (
     <main>

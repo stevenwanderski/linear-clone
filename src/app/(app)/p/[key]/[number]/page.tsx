@@ -12,9 +12,9 @@ import { IssueDescription } from "./issue-description";
 import { IssueFields, IssueTitle } from "./issue-fields";
 
 async function IssueDetail({ params, searchParams }: Pick<PageProps<"/p/[key]/[number]">, "params" | "searchParams">) {
-  await requireUser();
+  const user = await requireUser();
   const { key, number } = await params;
-  const issue = await getIssue(`${key}-${number}`);
+  const issue = await getIssue(user.id, `${key}-${number}`);
   if (!issue) notFound();
   const issueRef = `${issue.projectKey}-${issue.number}`;
   // Opened from the board (?view=board): the breadcrumb goes back to the board, not the list.

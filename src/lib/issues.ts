@@ -46,21 +46,33 @@ export const updateIssueInput = z.object({ ...issueFields, sortOrder: z.number()
 // Issue columns plus the project key (to show "WEB-42") and color.
 const issueWithKey = { ...getTableColumns(issues), projectKey: projects.key, projectColor: projects.color };
 
-// The project id for a key, as a subquery: lets one statement work by "WEB" instead of a UUID.
-const projectIdFor = (key: string) =>
-  db.select({ id: projects.id }).from(projects).where(eq(projects.key, key));
+// Every function below takes the signed-in user's id and only touches that user's projects and their issues.
+// Asking for someone else's "WEB-42" looks exactly like asking for one that doesn't exist.
+const ownedBy = (userId: string) => eq(projects.ownerId, userId);
 
-// Returns null if the key is already taken.
-export async function createProject(input: z.input<typeof createProjectInput>) {
+// The project id for a key, as a subquery: lets one statement work by "WEB" instead of a UUID.
+const projectIdFor = (userId: string, key: string) =>
+  db.select({ id: projects.id }).from(projects).where(and(ownedBy(userId), eq(projects.key, key)));
+
+// Returns null if this user already has a project with that key.
+export async function createProject(userId: string, input: z.input<typeof createProjectInput>) {
   const data = createProjectInput.parse(input);
-  const [project] = await db.insert(projects).values(data).onConflictDoNothing({ target: projects.key }).returning();
+  const [project] = await db
+    .insert(projects)
+    .values({ ...data, ownerId: userId })
+    .onConflictDoNothing({ target: [projects.ownerId, projects.key] })
+    .returning();
   return project ?? null;
 }
 
 // Returns null if no project has that key.
-export async function updateProject(key: string, input: z.input<typeof updateProjectInput>) {
+export async function updateProject(userId: string, key: string, input: z.input<typeof updateProjectInput>) {
   const data = updateProjectInput.parse(input);
-  const [project] = await db.update(projects).set(data).where(eq(projects.key, key.toUpperCase())).returning();
+  const [project] = await db
+    .update(projects)
+    .set(data)
+    .where(and(ownedBy(userId), eq(projects.key, key.toUpperCase())))
+    .returning();
   return project ?? null;
 }
 
@@ -72,7 +84,7 @@ export async function createIssue(userId: string, input: z.input<typeof createIs
   const result = await db.execute<{ id: string }>(sql`
     WITH n AS (
       UPDATE ${projects} SET issue_counter = issue_counter + 1
-      WHERE key = ${projectKey}
+      WHERE key = ${projectKey} AND owner_id = ${userId}
       RETURNING id, issue_counter
     )
     INSERT INTO ${issues} (project_id, number, title, description, status, creator_id, sort_order)
@@ -92,18 +104,18 @@ export async function createIssue(userId: string, input: z.input<typeof createIs
 }
 
 // Returns null if the ref is malformed or no such issue exists.
-export async function getIssue(ref: string) {
+export async function getIssue(userId: string, ref: string) {
   const parsed = parseRef(ref);
   if (!parsed) return null;
   const [issue] = await db
     .select(issueWithKey)
     .from(issues)
     .innerJoin(projects, eq(issues.projectId, projects.id))
-    .where(and(eq(projects.key, parsed.key), eq(issues.number, parsed.number)));
+    .where(and(ownedBy(userId), eq(projects.key, parsed.key), eq(issues.number, parsed.number)));
   return issue ?? null;
 }
 
-export async function updateIssue(ref: string, input: z.input<typeof updateIssueInput>) {
+export async function updateIssue(userId: string, ref: string, input: z.input<typeof updateIssueInput>) {
   const parsed = parseRef(ref);
   if (!parsed) return null;
   const data = updateIssueInput.parse(input);
@@ -111,24 +123,25 @@ export async function updateIssue(ref: string, input: z.input<typeof updateIssue
     await db
       .update(issues)
       .set(data)
-      .where(and(eq(issues.projectId, projectIdFor(parsed.key)), eq(issues.number, parsed.number)));
+      .where(and(eq(issues.projectId, projectIdFor(userId, parsed.key)), eq(issues.number, parsed.number)));
   }
-  return getIssue(ref);
+  return getIssue(userId, ref);
 }
 
 // Returns false if the ref is malformed or no such issue exists. Its number is not reused.
-export async function deleteIssue(ref: string) {
+export async function deleteIssue(userId: string, ref: string) {
   const parsed = parseRef(ref);
   if (!parsed) return false;
   const deleted = await db
     .delete(issues)
-    .where(and(eq(issues.projectId, projectIdFor(parsed.key)), eq(issues.number, parsed.number)))
+    .where(and(eq(issues.projectId, projectIdFor(userId, parsed.key)), eq(issues.number, parsed.number)))
     .returning({ id: issues.id });
   return deleted.length > 0;
 }
 
 // `openOnly` leaves out Done and Canceled.
 export async function listIssues(
+  userId: string,
   filter: { projectKey?: string; status?: string; openOnly?: boolean } = {},
 ) {
   const status = filter.status === undefined ? undefined : issueFields.status.parse(filter.status);
@@ -138,6 +151,7 @@ export async function listIssues(
     .innerJoin(projects, eq(issues.projectId, projects.id))
     .where(
       and(
+        ownedBy(userId),
         filter.projectKey ? eq(projects.key, filter.projectKey.toUpperCase()) : undefined,
         status ? eq(issues.status, status) : undefined,
         filter.openOnly ? notInArray(issues.status, ["done", "canceled"]) : undefined,
@@ -146,15 +160,16 @@ export async function listIssues(
     .orderBy(asc(issues.sortOrder), asc(issues.number));
 }
 
-export async function listProjects() {
+export async function listProjects(userId: string) {
   return db
     .select({ id: projects.id, key: projects.key, name: projects.name, color: projects.color })
     .from(projects)
+    .where(ownedBy(userId))
     .orderBy(asc(projects.name));
 }
 
 // Returns null if no project has this key.
-export async function getProject(key: string) {
-  const [project] = await db.select().from(projects).where(eq(projects.key, key.toUpperCase()));
+export async function getProject(userId: string, key: string) {
+  const [project] = await db.select().from(projects).where(and(ownedBy(userId), eq(projects.key, key.toUpperCase())));
   return project ?? null;
 }
