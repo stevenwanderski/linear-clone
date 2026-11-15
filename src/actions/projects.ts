@@ -1,8 +1,9 @@
 "use server";
 
-import { refresh } from "next/cache";
+import { redirect } from "next/navigation";
+import { refresh, revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth";
-import { createProject, createProjectInput, updateProject, updateProjectInput } from "@/lib/issues";
+import { createProject, createProjectInput, deleteProject, updateProject, updateProjectInput } from "@/lib/issues";
 
 export async function createProjectAction(fields: { name: string; key: string; color?: string }): Promise<{ error?: string }> {
   const user = await requireUser();
@@ -25,4 +26,12 @@ export async function updateProjectAction(key: string, changes: { name: string; 
 
   refresh(); // re-render so the header and sidebar show the change
   return {};
+}
+
+// Deletes the project and all its issues, then goes home: the project's page no longer exists.
+export async function deleteProjectAction(key: string): Promise<{ error?: string }> {
+  const user = await requireUser();
+  if (!(await deleteProject(user.id, key))) return { error: `Project ${key} not found` };
+  revalidatePath("/", "layout"); // the sidebar lists projects
+  redirect("/");
 }

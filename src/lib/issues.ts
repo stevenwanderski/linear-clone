@@ -81,6 +81,16 @@ export async function updateProject(userId: string, key: string, input: z.input<
   return project ?? null;
 }
 
+// Deletes the project and, through the issues table's ON DELETE CASCADE, every issue in it.
+// Returns false if this user has no project with that key.
+export async function deleteProject(userId: string, key: string) {
+  const deleted = await db
+    .delete(projects)
+    .where(and(ownedBy(userId), eq(projects.key, key.toUpperCase())))
+    .returning({ id: projects.id });
+  return deleted.length > 0;
+}
+
 export async function createIssue(userId: string, input: z.input<typeof createIssueInput>) {
   const { projectKey, ...data } = createIssueInput.parse(input);
 

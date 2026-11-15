@@ -57,6 +57,27 @@ describe("projects", () => {
   });
 });
 
+describe("deleting a project", () => {
+  test("a user can't delete someone else's project", async () => {
+    expect(await issues.deleteProject(bob, "OPS")).toBe(false);
+    expect(await issues.getProject(alice, "OPS")).not.toBeNull();
+  });
+
+  test("deletes only the owner's project with that key, along with its issues", async () => {
+    await issues.createProject(alice, { key: "TMP", name: "Alice's temp" });
+    await issues.createProject(bob, { key: "TMP", name: "Bob's temp" });
+    await issues.createIssue(alice, { projectKey: "TMP", title: "Goes with the project" });
+    await issues.createIssue(bob, { projectKey: "TMP", title: "Bob's stays" });
+
+    expect(await issues.deleteProject(alice, "TMP")).toBe(true);
+    expect(await issues.getProject(alice, "TMP")).toBeNull();
+    expect(await issues.getIssue(alice, "TMP-1")).toBeNull();
+    expect(await issues.getIssue(bob, "TMP-1")).toMatchObject({ title: "Bob's stays" });
+
+    await issues.deleteProject(bob, "TMP"); // later tests expect Bob to have no issues
+  });
+});
+
 describe("issues", () => {
   test("someone else's issue looks like it doesn't exist", async () => {
     expect(await issues.getIssue(alice, "WEB-1")).toMatchObject({ title: "Alice's secret" });

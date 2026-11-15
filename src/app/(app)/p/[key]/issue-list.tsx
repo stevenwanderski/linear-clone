@@ -65,7 +65,7 @@ export function IssueList({
 
   return (
     <>
-      <PageHeader title={<><ProjectBadge projectKey={project.key} color={project.color} />{project.name}<EditProjectDialog project={project} /></>}>
+      <PageHeader title={<><ProjectBadge projectKey={project.key} color={project.color} />{project.name}<EditProjectDialog project={project} issueCount={issues.length} /></>}>
         <ViewToggle projectKey={project.key} view={view} />
         <NewIssueDialog projectKey={project.key} onCreate={create} />
       </PageHeader>
