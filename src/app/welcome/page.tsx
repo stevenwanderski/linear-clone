@@ -109,12 +109,12 @@ export default function WelcomePage() {
             </div>
             <div className="flex flex-col border-t border-border/60 bg-background/40 p-6 md:border-t-0 md:border-l md:p-8">
               <h3 className="flex items-baseline gap-3">
-                <span className="text-7xl font-semibold tracking-tighter text-muted-foreground/40 tabular-nums">{cut.length}</span>
+                <span className="text-7xl font-semibold tracking-tighter text-muted-foreground/70 tabular-nums">{cut.length}</span>
                 <span className="text-sm font-medium text-muted-foreground">things out</span>
               </h3>
               <ul className="mt-8 flex flex-wrap gap-2" aria-label="Not included">
                 {cut.map((item) => (
-                  <li key={item} className="rounded-md border border-border/50 px-3 py-1.5 text-sm text-muted-foreground/60 line-through decoration-muted-foreground/40">
+                  <li key={item} className="rounded-md border border-border/50 px-3 py-1.5 text-sm text-muted-foreground line-through decoration-muted-foreground/60">
                     {item}
                   </li>
                 ))}
