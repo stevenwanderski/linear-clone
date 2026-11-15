@@ -8,7 +8,7 @@ async function OpenIssues() {
   const user = await requireUser();
   const issues = await listIssues(user.id, { openOnly: true });
   if (issues.length === 0) return <EmptyState>No open issues. Everything is done.</EmptyState>;
-  return <IssueGroups rows={issues} />;
+  return <IssueGroups rows={issues} showProject />;
 }
 
 // Every open issue across your projects. Login lands here.

@@ -43,8 +43,13 @@ export const createIssueInput = z.object({
 // Every field optional: only the ones you pass get changed. sortOrder is the position within a status column.
 export const updateIssueInput = z.object({ ...issueFields, sortOrder: z.number().finite() }).partial();
 
-// Issue columns plus the project key (to show "WEB-42") and color.
-const issueWithKey = { ...getTableColumns(issues), projectKey: projects.key, projectColor: projects.color };
+// Issue columns plus the project's key (to show "WEB-42"), name and color.
+const issueWithKey = {
+  ...getTableColumns(issues),
+  projectKey: projects.key,
+  projectName: projects.name,
+  projectColor: projects.color,
+};
 
 // Every function below takes the signed-in user's id and only touches that user's projects and their issues.
 // Asking for someone else's "WEB-42" looks exactly like asking for one that doesn't exist.

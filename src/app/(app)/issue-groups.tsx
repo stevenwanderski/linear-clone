@@ -1,14 +1,17 @@
 import Link from "next/link";
+import { ProjectBadge } from "@/components/project-badge";
 import { StatusIcon } from "@/components/issue-icons";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { listIssues } from "@/lib/issues";
 import { statusLabels } from "@/lib/labels";
 
 type Issue = Awaited<ReturnType<typeof listIssues>>[number];
-export type IssueRow = Pick<Issue, "id" | "number" | "title" | "status" | "sortOrder" | "projectKey"> & { pending?: boolean };
+export type IssueRow = Pick<Issue, "id" | "number" | "title" | "status" | "sortOrder" | "projectKey"> &
+  Partial<Pick<Issue, "projectName" | "projectColor">> & { pending?: boolean };
 
 // Issues under status headings, in workflow order. Used by the project page and the home page.
-export function IssueGroups({ rows }: { rows: IssueRow[] }) {
+// `showProject` adds each issue's project on the right, for pages that mix projects.
+export function IssueGroups({ rows, showProject = false }: { rows: IssueRow[]; showProject?: boolean }) {
   return (Object.keys(statusLabels) as Issue["status"][]).map((status) => {
     const group = rows.filter((row) => row.status === status);
     if (group.length === 0) return null;
@@ -29,6 +32,12 @@ export function IssueGroups({ rows }: { rows: IssueRow[] }) {
                 </span>
                 <StatusIcon status={row.status} />
                 <span className="truncate">{row.title}</span>
+                {showProject && (
+                  <span className="ml-auto flex shrink-0 items-center gap-1.5 text-muted-foreground">
+                    <ProjectBadge projectKey={row.projectKey} color={row.projectColor} />
+                    {row.projectName}
+                  </span>
+                )}
               </>
             );
             return (
