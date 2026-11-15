@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { appName } from "@/lib/brand";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Skeleton } from "@/components/ui/skeleton";
 import { requireUser } from "@/lib/auth";
@@ -26,7 +27,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
         <div className="mb-3 flex items-center justify-between pl-1">
           <Link href="/" className="flex items-center gap-2 text-[13px] font-semibold">
             <Logo className="size-5" />
-            Linear Lite
+            {appName}
           </Link>
           <ThemeToggle />
         </div>

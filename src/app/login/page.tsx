@@ -2,8 +2,8 @@
 
 import { Suspense, use } from "react";
 import { Logo } from "@/components/logo";
-import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth-client";
+import { GitHubSignInButton } from "@/components/github-sign-in-button";
+import { appName } from "@/lib/brand";
 
 type SearchParams = Promise<{ error?: string }>;
 
@@ -18,18 +18,10 @@ export default function LoginPage({ searchParams }: { searchParams: SearchParams
     <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-sidebar p-6">
       <Logo className="size-12" />
       <div className="text-center">
-        <h1 className="text-xl font-semibold">Welcome to Linear Lite</h1>
+        <h1 className="text-xl font-semibold">Welcome to {appName}</h1>
         <p className="mt-1 text-sm text-muted-foreground">Projects and issues, without the noise.</p>
       </div>
-      <Button
-        size="lg"
-        className="w-64"
-        onClick={() =>
-          authClient.signIn.social({ provider: "github", callbackURL: "/", errorCallbackURL: "/login" })
-        }
-      >
-        Continue with GitHub
-      </Button>
+      <GitHubSignInButton className="w-64" />
       <Suspense>
         <ErrorMessage searchParams={searchParams} />
       </Suspense>

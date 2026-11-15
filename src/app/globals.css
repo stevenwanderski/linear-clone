@@ -135,3 +135,20 @@
     cursor: pointer;
   }
 }
+/* Landing page: sections fade up as they scroll into view. CSS only; browsers without scroll-driven
+   animations, and anyone who prefers reduced motion, just see them. */
+@keyframes fade-in-view {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-in-view {
+      animation: fade-in-view linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
