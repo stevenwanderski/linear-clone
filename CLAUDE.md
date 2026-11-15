@@ -30,7 +30,7 @@ The work is split into Linear cards (team "Happy Code", project "Linear", titled
 <!-- One line each: what we chose and why. -->
 - Node 22 (`.nvmrc`), because the Better Auth CLI needs it. Netlify reads `.nvmrc` too.
 - Dev server runs on port 3001 (`npm run dev`), because another project always uses 3000.
-- Vitest tests cover only DB-free code (ref parsing, validation): there is no test database, only the live one.
+- Vitest tests never touch the live database. Tests that need one swap `@/db` for an in-memory PGlite built from the real migrations (see `src/lib/authorization.test.ts`).
 - Local dev (`.env.local`) uses the live database on purpose. Anything created while testing shows on the live site.
 - Claude Code's `linear-lite` MCP server is added at local scope (`claude mcp add -s local`), so the API key stays out of the repo.
 - Open sign-up (no email allowlist): anyone with GitHub can sign in, and projects are scoped to their owner.
