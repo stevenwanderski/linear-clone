@@ -27,7 +27,7 @@ A stripped-down Linear: **projects and issues only**, fast keyboard-driven UI, a
 
 **Out (v1):** comments, labels, cycles, teams/workspaces, notifications, attachments, real-time sync, webhooks, mobile app.
 
-**Access model:** one shared workspace. Every signed-in user sees everything. Sign-in is restricted to an **allowlist of GitHub emails** (env var) so strangers can't get in.
+**Access model:** anyone with a GitHub account can sign in. Each user has their own projects and issues, and nobody else can see or change them (projects have an owner; every query filters by it).
 
 ---
 
@@ -135,9 +135,8 @@ Each phase ends deployed and working on Netlify.
 
 ### Phase 1 — Auth (½ day)
 - Better Auth with GitHub provider; create the GitHub OAuth app (callback: `<site>/api/auth/callback/github`; make a second OAuth app for localhost).
-- Email allowlist check on sign-in.
 - Middleware redirects signed-out users to `/login` (cookie check only — no DB call in middleware, it runs at the edge).
-- **Done when:** you can sign in on the live site; a non-allowlisted account is rejected.
+- **Done when:** you can sign in on the live site.
 
 ### Phase 2 — Projects & issues CRUD (1–2 days)
 - Schema + migration for `projects`, `issues`.
@@ -190,7 +189,6 @@ Each phase ends deployed and working on Netlify.
   BETTER_AUTH_URL        # https://<site>.netlify.app
   GITHUB_CLIENT_ID
   GITHUB_CLIENT_SECRET
-  ALLOWED_EMAILS         # comma-separated
   ```
 - Migrations: run `drizzle-kit migrate` from your machine against prod for now.
   *shortcut: manual migrations; move into a CI step once others contribute.*
@@ -227,7 +225,7 @@ If you ever need multi-statement transactions, switch to `drizzle-orm/neon-serve
 | Netlify function timeout (~10s default) | Keep requests short; no long streaming |
 | Edge middleware can't use Node APIs/DB | Only check the session cookie there |
 | MCP OAuth spec churn | API keys first; OAuth last, with fresh docs |
-| Anyone with a GitHub account signs in | Email allowlist |
+| Anyone with a GitHub account signs in | Fine: each user only sees their own projects and issues |
 | Leaked API key = full access | Hash keys, allow revoke, show once |
 | Cold starts on the free tier | Acceptable for a personal app |
 | Prompt injection via issue text read by Claude | Treat as data; Claude asks before destructive actions (no delete tool in v1) |

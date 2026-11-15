@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-type Key = { id: string; name: string; start: string | null; created: string };
+type Key = { id: string; name: string; start: string | null; created: string; expires: string | null };
 
 export function ApiKeys({ keys }: { keys: Key[] }) {
   // The full key of the one just created. It lives only in this state: reload the page and it's gone.
@@ -50,7 +50,7 @@ export function ApiKeys({ keys }: { keys: Key[] }) {
               <div className="grid min-w-0 flex-1">
                 <span className="truncate font-medium">{key.name}</span>
                 <span className="text-xs text-muted-foreground">
-                  <code>{key.start}…</code> · Created {key.created}
+                  <code>{key.start}…</code> · Created {key.created} · {key.expires ? `Expires ${key.expires}` : "Never expires"}
                 </span>
               </div>
               <RevokeButton keyId={key.id} name={key.name} />

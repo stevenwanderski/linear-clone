@@ -88,7 +88,7 @@ Today `/` is the signed-in app home, and the proxy sends anyone without a sessio
 4. **MCP section.** Command block with copy button, mock chat, tool list.
 5. **Polish.** Scroll fade-ins, mobile pass, metadata (title, description, Open Graph image), Lighthouse check.
 
-**Done when:** a logged-out visitor at the live URL sees the page, it scores 90+ on Lighthouse performance, and "Continue with GitHub" signs an allowed user into the app.
+**Done when:** a logged-out visitor at the live URL sees the page, it scores 90+ on Lighthouse performance, and "Continue with GitHub" signs the visitor into the app.
 
 ---
 

@@ -12,7 +12,7 @@ async function KeyList() {
   const { apiKeys } = await auth.api.listApiKeys({ headers: await headers() });
   const keys = apiKeys
     .toSorted((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-    .map((k) => ({ id: k.id, name: k.name ?? "Untitled", start: k.start, created: formatDate(k.createdAt) }));
+    .map((k) => ({ id: k.id, name: k.name ?? "Untitled", start: k.start, created: formatDate(k.createdAt), expires: k.expiresAt ? formatDate(k.expiresAt) : null }));
   return <ApiKeys keys={keys} />;
 }
 

@@ -7,13 +7,6 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 
-const allowedEmails = (process.env.ALLOWED_EMAILS ?? "")
-  .split(",")
-  .map((e) => e.trim().toLowerCase())
-  .filter(Boolean);
-
-const isAllowed = (email: string) => allowedEmails.includes(email.toLowerCase());
-
 export const auth = betterAuth({
   database: drizzleAdapter(db, { provider: "pg", schema }),
   socialProviders: {
@@ -27,23 +20,10 @@ export const auth = betterAuth({
       defaultPrefix: "ll_", // makes Linear Lite keys easy to spot
       // The default (10 requests a day) would block the MCP server, which checks the key on every call.
       rateLimit: { enabled: false },
+      // A leaked key stops working on its own. In seconds.
+      keyExpiration: { defaultExpiresIn: 60 * 60 * 24 * 90 },
     }),
   ],
-  databaseHooks: {
-    // Returning false cancels the write, so the sign-in fails.
-    user: {
-      create: { before: async (user) => isAllowed(user.email) },
-    },
-    // Also checked on every new session, so removing an email from the list locks out an existing user.
-    session: {
-      create: {
-        before: async (session, ctx) => {
-          const user = await ctx?.context.internalAdapter.findUserById(session.userId);
-          return !!user && isAllowed(user.email);
-        },
-      },
-    },
-  },
 });
 
 // For pages and server actions: the signed-in user, or a redirect to /login.

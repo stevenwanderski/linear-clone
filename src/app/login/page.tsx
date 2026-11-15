@@ -10,7 +10,7 @@ type SearchParams = Promise<{ error?: string }>;
 // Better Auth sends failed sign-ins back here with ?error=...
 function ErrorMessage({ searchParams }: { searchParams: SearchParams }) {
   const { error } = use(searchParams);
-  return error ? <p className="text-sm text-destructive">This account isn&apos;t allowed to sign in.</p> : null;
+  return error ? <p className="text-sm text-destructive">Sign-in didn&apos;t work. Try again.</p> : null;
 }
 
 export default function LoginPage({ searchParams }: { searchParams: SearchParams }) {
