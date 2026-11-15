@@ -2,7 +2,7 @@ import { createMcpHandler, withMcpAuth } from "mcp-handler";
 import { z } from "zod";
 import { issueStatus } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { createIssue, createProject, getIssue, listIssues, listProjects, updateIssue } from "@/lib/issues";
+import { createIssue, createProject, deleteIssue, getIssue, listIssues, listProjects, updateIssue } from "@/lib/issues";
 import { projectColors, type ProjectColor } from "@/lib/labels";
 
 // The MCP server Claude Code talks to. Every tool is a thin wrapper around src/lib/issues.ts, which
@@ -102,6 +102,16 @@ const handler = createMcpHandler(
         if (!issue) return error(`No issue ${ref}`);
         return text(summary(issue));
       }),
+    );
+
+    server.registerTool(
+      "delete_issue",
+      {
+        title: "Delete issue",
+        description: "Permanently delete an issue. This can't be undone; to just close it, set status to canceled.",
+        inputSchema: z.object({ ref }),
+      },
+      async ({ ref }) => ((await deleteIssue(ref)) ? text({ deleted: ref }) : error(`No issue ${ref}`)),
     );
 
     server.registerTool(

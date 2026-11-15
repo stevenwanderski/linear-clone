@@ -3,7 +3,7 @@
 import { refresh } from "next/cache";
 import { requireUser } from "@/lib/auth";
 import type { z } from "zod";
-import { createIssue, createIssueInput, updateIssue, type updateIssueInput } from "@/lib/issues";
+import { createIssue, createIssueInput, deleteIssue, updateIssue, type updateIssueInput } from "@/lib/issues";
 
 export async function createIssueAction(projectKey: string, title: string): Promise<{ error?: string }> {
   const user = await requireUser();
@@ -20,4 +20,9 @@ export async function updateIssueAction(ref: string, changes: z.input<typeof upd
   await requireUser();
   await updateIssue(ref, changes);
   refresh();
+}
+
+export async function deleteIssueAction(ref: string) {
+  await requireUser();
+  await deleteIssue(ref);
 }

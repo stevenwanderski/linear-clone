@@ -7,6 +7,7 @@ import { ProjectBadge } from "@/components/project-badge";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { getIssue } from "@/lib/issues";
+import { DeleteIssueDialog } from "./delete-issue-dialog";
 import { IssueDescription } from "./issue-description";
 import { IssueFields, IssueTitle } from "./issue-fields";
 
@@ -40,7 +41,10 @@ async function IssueDetail({ params, searchParams }: Pick<PageProps<"/p/[key]/[n
         </article>
         <aside className="w-72 shrink-0 border-l p-4">
           <h2 className="mb-3 px-2 text-xs font-medium text-muted-foreground">Properties</h2>
-<IssueFields issueRef={issueRef} status={issue.status} />
+          <IssueFields issueRef={issueRef} status={issue.status} />
+          <div className="mt-4 border-t pt-4">
+            <DeleteIssueDialog issueRef={issueRef} projectKey={issue.projectKey} />
+          </div>
         </aside>
       </div>
     </>

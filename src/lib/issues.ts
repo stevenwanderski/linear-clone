@@ -116,6 +116,17 @@ export async function updateIssue(ref: string, input: z.input<typeof updateIssue
   return getIssue(ref);
 }
 
+// Returns false if the ref is malformed or no such issue exists. Its number is not reused.
+export async function deleteIssue(ref: string) {
+  const parsed = parseRef(ref);
+  if (!parsed) return false;
+  const deleted = await db
+    .delete(issues)
+    .where(and(eq(issues.projectId, projectIdFor(parsed.key)), eq(issues.number, parsed.number)))
+    .returning({ id: issues.id });
+  return deleted.length > 0;
+}
+
 // `openOnly` leaves out Done and Canceled.
 export async function listIssues(
   filter: { projectKey?: string; status?: string; openOnly?: boolean } = {},
