@@ -32,4 +32,6 @@ The work is split into Linear cards (team "Happy Code", project "Linear", titled
 - Dev server runs on port 3001 (`npm run dev`), because another project always uses 3000.
 - Vitest tests cover only DB-free code (ref parsing, validation): there is no test database, only the live one.
 - Local dev (`.env.local`) uses the live database on purpose. Anything created while testing shows on the live site.
+- Claude Code's `linear-lite` MCP server is added at local scope (`claude mcp add -s local`), so the API key stays out of the repo.
+- No OAuth / claude.ai connectors (card 20 canceled): MCP auth is API keys only.
 - Migrations are run by hand (`npm run db:migrate`), never by Netlify: migrate before pushing code that adds a column, push before migrating one that drops a column.
