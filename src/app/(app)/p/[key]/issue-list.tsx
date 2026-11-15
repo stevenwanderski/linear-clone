@@ -15,7 +15,8 @@ import { IssueBoard } from "./issue-board";
 import { NewIssueDialog } from "./new-issue-dialog";
 
 type Issue = Awaited<ReturnType<typeof listIssues>>[number];
-type Change = { type: "add"; title: string } | { type: "move"; id: string; status: IssueRow["status"]; sortOrder: number };
+export type NewIssue = { title: string; description: string; status: IssueRow["status"] };
+type Change = ({ type: "add" } & NewIssue) | { type: "move"; id: string; status: IssueRow["status"]; sortOrder: number };
 const byPosition = (a: IssueRow, b: IssueRow) => a.sortOrder - b.sortOrder || a.number - b.number;
 
 export function IssueList({
@@ -33,17 +34,17 @@ export function IssueList({
       ? [
           ...current,
           // Dimmed with no number yet; sorts to the bottom like a real new issue.
-          { id: `pending-${current.length}`, number: 0, title: change.title, status: "backlog", sortOrder: Infinity, projectKey: project.key, pending: true },
+          { id: `pending-${current.length}`, number: 0, title: change.title, status: change.status, sortOrder: Infinity, projectKey: project.key, pending: true },
         ]
       : current.map((row) => (row.id === change.id ? { ...row, status: change.status, sortOrder: change.sortOrder } : row)).sort(byPosition),
   );
   const [, startTransition] = useTransition();
 
   // Runs inside the form's action, which React already wraps in a transition, so show() is allowed here.
-  async function create(title: string) {
-    show({ type: "add", title });
+  async function create(issue: NewIssue) {
+    show({ type: "add", ...issue });
     try {
-      const { error } = await createIssueAction(project.key, title);
+      const { error } = await createIssueAction(project.key, issue);
       if (error) toast.error(error);
     } catch {
       toast.error("Couldn't create the issue. Try again.");
@@ -69,7 +70,7 @@ export function IssueList({
         <NewIssueDialog projectKey={project.key} onCreate={create} />
       </PageHeader>
       {view === "board" ? (
-        <IssueBoard rows={rows} onMove={move} />
+        <IssueBoard rows={rows} onMove={move} projectKey={project.key} onCreate={create} />
       ) : rows.length === 0 ? (
         <EmptyState>
           No issues yet. Use <span className="font-medium text-foreground">New issue</span> to add the first one.

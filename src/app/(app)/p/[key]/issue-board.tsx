@@ -23,6 +23,8 @@ import { statusLabels } from "@/lib/labels";
 import { positionBetween } from "@/lib/position";
 import { cn } from "@/lib/utils";
 import type { IssueRow } from "../../issue-groups";
+import type { NewIssue } from "./issue-list";
+import { NewIssueDialog } from "./new-issue-dialog";
 
 type Status = IssueRow["status"];
 const statuses = Object.keys(statusLabels) as Status[];
@@ -36,7 +38,17 @@ const underPointer: CollisionDetection = (args) => {
 };
 
 // One column per status. Dragging a card calls onMove with its new status and sort order; the parent saves it.
-export function IssueBoard({ rows, onMove }: { rows: IssueRow[]; onMove: (row: IssueRow, status: Status, sortOrder: number) => void }) {
+export function IssueBoard({
+  rows,
+  onMove,
+  projectKey,
+  onCreate,
+}: {
+  rows: IssueRow[];
+  onMove: (row: IssueRow, status: Status, sortOrder: number) => void;
+  projectKey: string;
+  onCreate: (issue: NewIssue) => Promise<void>;
+}) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }), // a plain click still opens the issue
@@ -83,7 +95,7 @@ export function IssueBoard({ rows, onMove }: { rows: IssueRow[]; onMove: (row: I
     >
       <div className="flex items-start gap-3 overflow-x-auto p-3">
         {statuses.map((status) => (
-          <Column key={status} status={status} rows={columnRows(status)} />
+          <Column key={status} status={status} rows={columnRows(status)} newIssue={<NewIssueDialog projectKey={projectKey} onCreate={onCreate} status={status} />} />
         ))}
       </div>
       {/* No drop animation: the card is already in its new spot (optimistic), so animating the overlay
@@ -93,7 +105,7 @@ export function IssueBoard({ rows, onMove }: { rows: IssueRow[]; onMove: (row: I
   );
 }
 
-function Column({ status, rows }: { status: Status; rows: IssueRow[] }) {
+function Column({ status, rows, newIssue }: { status: Status; rows: IssueRow[]; newIssue: React.ReactNode }) {
   const id = `column:${status}`;
   const { setNodeRef } = useDroppable({ id });
   // Highlight when a card from another column is over this column or one of its cards.
@@ -112,6 +124,7 @@ function Column({ status, rows }: { status: Status; rows: IssueRow[] }) {
         <StatusIcon status={status} />
         {statusLabels[status]}
         <span className="font-normal text-muted-foreground">{rows.length}</span>
+        <span className="ml-auto">{newIssue}</span>
       </h2>
       <SortableContext items={rows.map((row) => row.id)} strategy={verticalListSortingStrategy}>
         <ul className="flex min-h-24 flex-col gap-2 p-2 pt-0">

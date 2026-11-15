@@ -16,7 +16,7 @@ const withIcon = (icon: React.ReactNode, label: string) => (
     {label}
   </span>
 );
-const statusItems = (Object.entries(statusLabels) as [Changes["status"] & string, string][]).map(([value, label]) => ({
+export const statusItems = (Object.entries(statusLabels) as [Changes["status"] & string, string][]).map(([value, label]) => ({
   value,
   label: withIcon(<StatusIcon status={value} />, label),
 }));

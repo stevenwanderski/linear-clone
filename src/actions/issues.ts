@@ -5,9 +5,12 @@ import { requireUser } from "@/lib/auth";
 import type { z } from "zod";
 import { createIssue, createIssueInput, deleteIssue, updateIssue, type updateIssueInput } from "@/lib/issues";
 
-export async function createIssueAction(projectKey: string, title: string): Promise<{ error?: string }> {
+export async function createIssueAction(
+  projectKey: string,
+  fields: Omit<z.input<typeof createIssueInput>, "projectKey">,
+): Promise<{ error?: string }> {
   const user = await requireUser();
-  const input = createIssueInput.safeParse({ projectKey, title });
+  const input = createIssueInput.safeParse({ projectKey, ...fields });
   if (!input.success) return { error: input.error.issues[0].message };
 
   await createIssue(user.id, input.data);
