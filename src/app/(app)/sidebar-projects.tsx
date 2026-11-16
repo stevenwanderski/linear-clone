@@ -1,6 +1,7 @@
 "use client";
 
 import { useOptimistic } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createProjectAction } from "@/actions/projects";
 import { ProjectBadge } from "@/components/project-badge";
@@ -11,6 +12,7 @@ type Project = { id: string; key: string; name: string; color?: string | null; p
 type NewProject = { name: string; key: string; color?: string };
 
 export function SidebarProjects({ projects }: { projects: Project[] }) {
+  const router = useRouter();
   // A new project shows at once, dimmed. When the save finishes, React swaps in the real list.
   const [shown, addProject] = useOptimistic<Project[], NewProject>(projects, (current, p) =>
     [...current, { id: `pending-${p.key}`, key: p.key.toUpperCase(), name: p.name, color: p.color, pending: true }].sort((a, b) =>
@@ -23,7 +25,8 @@ export function SidebarProjects({ projects }: { projects: Project[] }) {
     addProject(project);
     try {
       const { error } = await createProjectAction(project);
-      if (error) toast.error(error);
+      if (error) return void toast.error(error);
+      router.push(`/p/${project.key.trim().toUpperCase()}`);
     } catch {
       toast.error("Couldn't create the project. Try again.");
     }
