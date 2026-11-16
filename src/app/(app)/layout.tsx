@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { requireUser } from "@/lib/auth";
 import { listProjects } from "@/lib/issues";
 import { AccountMenu } from "./account-menu";
+import { AutoRefresh } from "./auto-refresh";
 import { SidebarProjects } from "./sidebar-projects";
 
 async function ProjectList() {
@@ -23,6 +24,7 @@ async function Account() {
 export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex h-screen bg-sidebar">
+      <AutoRefresh />
       <aside className="flex w-60 shrink-0 flex-col overflow-y-auto p-3 text-sidebar-foreground">
         <div className="mb-3 flex items-center justify-between pl-1">
           <Link href="/" className="flex items-center gap-2 text-[13px] font-semibold">
