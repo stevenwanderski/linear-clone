@@ -4,10 +4,12 @@ import { useState, useTransition } from "react";
 import { CheckIcon, CopyIcon, KeyRoundIcon } from "lucide-react";
 import { toast } from "sonner";
 import { createApiKeyAction, revokeApiKeyAction } from "@/actions/api-keys";
+import { CopyCommand } from "@/components/copy-command";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { mcpCommand } from "@/lib/brand";
 
 type Key = { id: string; name: string; start: string | null; created: string; expires: string | null };
 
@@ -41,7 +43,9 @@ export function ApiKeys({ keys }: { keys: Key[] }) {
       {newKey && <NewKey value={newKey} onDone={() => setNewKey(null)} />}
 
       {keys.length === 0 ? (
-        <p className="rounded-lg border border-dashed p-6 text-center text-[13px] text-muted-foreground">No API keys yet.</p>
+        <p className="rounded-lg border border-dashed p-6 text-center text-[13px] text-muted-foreground">
+          No API keys yet. Create one above and you&apos;ll get a command that connects Claude Code to your issues.
+        </p>
       ) : (
         <ul className="divide-y rounded-lg border">
           {keys.map((key) => (
@@ -82,6 +86,9 @@ function NewKey({ value, onDone }: { value: string; onDone: () => void }) {
           {copied ? "Copied" : "Copy"}
         </Button>
       </div>
+      {/* The same key, already filled into the setup command: the quickest way to connect. */}
+      <p className="mt-2 font-medium">Then connect Claude Code by running this in your terminal:</p>
+      <CopyCommand command={mcpCommand(value)} />
       <Button type="button" variant="link" size="sm" className="justify-self-start px-0 text-muted-foreground" onClick={onDone}>
         I&apos;ve saved it
       </Button>

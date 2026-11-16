@@ -14,14 +14,17 @@ import type { NewIssue } from "./issue-list";
 
 // Closes as soon as you submit: the parent shows the issue right away and reports any error as a toast.
 // With `status` (a board column), the trigger is a small + and the status starts on that column.
+// With `label`, the trigger is a full-size button with that text (the empty project placeholder).
 export function NewIssueDialog({
   projectKey,
   onCreate,
   status,
+  label,
 }: {
   projectKey: string;
   onCreate: (issue: NewIssue) => Promise<void>;
   status?: NewIssue["status"];
+  label?: string;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -30,10 +33,13 @@ export function NewIssueDialog({
         <DialogTrigger render={<Button variant="ghost" size="icon-xs" aria-label={`New issue in ${statusLabels[status]}`} />}>
           <PlusIcon />
         </DialogTrigger>
+      ) : label ? (
+        <DialogTrigger render={<Button />}>{label}</DialogTrigger>
       ) : (
         <DialogTrigger render={<Button size="sm" />}>New issue</DialogTrigger>
       )}
-      <DialogContent>
+      {/* Wide, so the description has room for real writing. */}
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>New issue in {projectKey}</DialogTitle>
         </DialogHeader>
@@ -55,12 +61,12 @@ export function NewIssueDialog({
           </div>
           <div className="grid gap-2">
             <Label htmlFor="description">Description</Label>
-            <Textarea id="description" name="description" placeholder="Markdown, optional" rows={5} />
+            <Textarea id="description" name="description" placeholder="Markdown, optional" className="min-h-64 max-h-[50vh] overflow-y-auto" />
           </div>
           <div className="grid gap-2">
             <Label>Status</Label>
             <Select name="status" items={statusItems} defaultValue={status ?? "backlog"}>
-              <SelectTrigger aria-label="Status" className="w-full"><SelectValue /></SelectTrigger>
+              <SelectTrigger aria-label="Status" className="w-44"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {statusItems.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
               </SelectContent>

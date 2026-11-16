@@ -58,12 +58,6 @@ export function IssueGroups({ rows, showProject = false }: { rows: IssueRow[]; s
   });
 }
 
-export function EmptyState({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="m-6 rounded-lg border border-dashed p-10 text-center text-[13px] text-muted-foreground">{children}</div>
-  );
-}
-
 export function ListSkeleton() {
   return (
     <div className="grid gap-3 p-6">

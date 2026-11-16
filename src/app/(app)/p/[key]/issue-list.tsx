@@ -2,14 +2,15 @@
 
 import { useOptimistic, useTransition } from "react";
 import Link from "next/link";
-import { Columns3Icon, Rows3Icon } from "lucide-react";
+import { Columns3Icon, ListTodoIcon, Rows3Icon } from "lucide-react";
 import { toast } from "sonner";
 import { createIssueAction, updateIssueAction } from "@/actions/issues";
 import type { listIssues } from "@/lib/issues";
 import { PageHeader } from "@/components/page-header";
+import { Placeholder } from "@/components/placeholder";
 import { ProjectBadge } from "@/components/project-badge";
 import { cn } from "@/lib/utils";
-import { EmptyState, IssueGroups, type IssueRow } from "../../issue-groups";
+import { IssueGroups, type IssueRow } from "../../issue-groups";
 import { EditProjectDialog } from "./edit-project-dialog";
 import { IssueBoard } from "./issue-board";
 import { NewIssueDialog } from "./new-issue-dialog";
@@ -69,12 +70,22 @@ export function IssueList({
         <ViewToggle projectKey={project.key} view={view} />
         <NewIssueDialog projectKey={project.key} onCreate={create} />
       </PageHeader>
-      {view === "board" ? (
+      {/* An empty project gets the same hint in both views: five empty board columns explain nothing. */}
+      {rows.length === 0 ? (
+        <Placeholder
+          icon={<ListTodoIcon />}
+          title={`No issues in ${project.name} yet`}
+          action={<NewIssueDialog projectKey={project.key} onCreate={create} label="Create the first issue" />}
+          footnote={
+            <>
+              Or ask Claude Code: <span className="font-mono text-xs text-foreground">&quot;create an issue in {project.key} for …&quot;</span>
+            </>
+          }
+        >
+          An issue is one piece of work: a bug, a feature, a task. Each gets a number, like {project.key}-1.
+        </Placeholder>
+      ) : view === "board" ? (
         <IssueBoard rows={rows} onMove={move} projectKey={project.key} onCreate={create} />
-      ) : rows.length === 0 ? (
-        <EmptyState>
-          No issues yet. Use <span className="font-medium text-foreground">New issue</span> to add the first one.
-        </EmptyState>
       ) : (
         <IssueGroups rows={rows} />
       )}

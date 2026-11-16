@@ -4,8 +4,8 @@ import Link from "next/link";
 import { ArrowRightIcon, BoxIcon, CheckIcon, Columns3Icon, KeyRoundIcon } from "lucide-react";
 import { GitHubSignInButton } from "@/components/github-sign-in-button";
 import { Logo } from "@/components/logo";
-import { appName, repoUrl, siteUrl } from "@/lib/brand";
-import { CopyCommand } from "./copy-command";
+import { CopyCommand } from "@/components/copy-command";
+import { appName, mcpCommand, repoUrl, siteUrl } from "@/lib/brand";
 
 // Five things in, a pile of things out: the imbalance is the point.
 const kept = [
@@ -26,7 +26,6 @@ const features = [
   { Icon: Columns3Icon, title: "List or board", body: "Group issues by status, or drag them across columns." },
 ];
 
-const mcpCommand = `claude mcp add --transport http linear-lite ${siteUrl}/api/mcp --header "Authorization: Bearer <your-api-key>"`;
 const mcpTools = ["create_issue", "update_issue", "get_issue", "list_issues", "delete_issue", "list_projects", "create_project"];
 
 // No `title`: the root layout sets it (see the note there).
@@ -146,7 +145,7 @@ export default function WelcomePage() {
                 Make an API key in Settings, then add the server to Claude Code with one command.
               </p>
               <div className="mt-6">
-                <CopyCommand command={mcpCommand} />
+                <CopyCommand command={mcpCommand()} />
               </div>
               <ul className="mt-6 flex flex-wrap gap-2" aria-label="MCP tools">
                 {mcpTools.map((tool) => (

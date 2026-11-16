@@ -8,11 +8,22 @@ import { Label } from "@/components/ui/label";
 import { ColorPicker } from "@/components/color-picker";
 
 // Closes as soon as you submit: the parent shows the project right away and reports any error as a toast.
-export function NewProjectDialog({ onCreate }: { onCreate: (project: { name: string; key: string; color?: string }) => Promise<void> }) {
+// Opens from the sidebar's small +, or from a full button when given a `label`.
+export function NewProjectDialog({
+  onCreate,
+  label,
+}: {
+  onCreate: (project: { name: string; key: string; color?: string }) => Promise<void>;
+  label?: string;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button variant="ghost" size="icon-xs" aria-label="New project" />}>+</DialogTrigger>
+      {label ? (
+        <DialogTrigger render={<Button />}>{label}</DialogTrigger>
+      ) : (
+        <DialogTrigger render={<Button variant="ghost" size="icon-xs" aria-label="New project" />}>+</DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>New project</DialogTitle>
