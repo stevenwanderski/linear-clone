@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <style>g{stroke:#111}@media (prefers-color-scheme:dark){g{stroke:#fff}}</style>
-  <g transform="rotate(45 16 16)" stroke-width="3" stroke-linecap="round">
+  <!-- Dark rounded square with a white mark, so it reads on any tab color -->
+  <rect width="32" height="32" rx="7" fill="#111"/>
+  <g transform="translate(16 16) scale(0.84) translate(-16 -16) rotate(45 16 16)" stroke="#fff" stroke-width="3" stroke-linecap="round">
     <line x1="3.75" y1="9.22" x2="3.75" y2="22.78"/>
     <line x1="8.65" y1="4.08" x2="8.65" y2="27.92"/>
     <line x1="13.55" y1="2.22" x2="13.55" y2="29.78"/>
