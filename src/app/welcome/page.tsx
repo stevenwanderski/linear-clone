@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
-import { ArrowRightIcon, BoxIcon, CheckIcon, Columns3Icon, KeyRoundIcon } from "lucide-react";
+import { BoxIcon, CheckIcon, Columns3Icon, KeyRoundIcon } from "lucide-react";
 import { GitHubSignInButton } from "@/components/github-sign-in-button";
-import { Logo } from "@/components/logo";
+import { SiteFooter, SiteHeader } from "@/components/site-chrome";
 import { CopyCommand } from "@/components/copy-command";
-import { appName, mcpCommand, repoUrl, siteUrl } from "@/lib/brand";
+import { appName, mcpCommand, siteUrl } from "@/lib/brand";
 
 // Five things in, a pile of things out: the imbalance is the point.
 const kept = [
@@ -40,18 +39,7 @@ export const metadata: Metadata = {
 export default function WelcomePage() {
   return (
     <div className="dark flex min-h-screen flex-col bg-background text-foreground">
-      <header className="sticky top-0 z-10 border-b border-border/50 bg-background/70 backdrop-blur">
-        <nav className="mx-auto flex h-14 max-w-[1100px] items-center justify-between px-4">
-          <Link href="/" className="flex items-center gap-2 text-sm font-semibold">
-            <Logo className="size-5" />
-            {appName}
-          </Link>
-          <div className="flex items-center gap-5 text-sm text-muted-foreground">
-            <a href={repoUrl} className="hover:text-foreground">GitHub</a>
-            <Link href="/login" className="hover:text-foreground">Sign in</Link>
-          </div>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main className="flex-1">
         <section className="relative overflow-hidden">
@@ -64,10 +52,6 @@ export default function WelcomePage() {
             <p className="mt-5 text-lg text-muted-foreground md:text-xl">Projects and issues. That&apos;s it.</p>
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
               <GitHubSignInButton />
-              <a href={repoUrl} className="group flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-                View the code
-                <ArrowRightIcon className="size-4 transition-transform group-hover:translate-x-0.5" />
-              </a>
             </div>
             {/* The real app, fading out at the bottom edge. Retake public/board.png when the UI changes. */}
             <div className="mt-14 mask-b-from-60% md:mt-20">
@@ -158,12 +142,7 @@ export default function WelcomePage() {
         </section>
       </main>
 
-      <footer className="border-t border-border/50">
-        <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-2 px-4 py-6 text-sm text-muted-foreground">
-          <span>{appName}</span>
-          <span>Built with Next.js, Neon, Better Auth · <a href={repoUrl} className="hover:text-foreground">GitHub</a></span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

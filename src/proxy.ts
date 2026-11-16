@@ -11,6 +11,6 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except the login and landing pages, auth API, MCP server (it checks API keys itself), and static files and images.
-  matcher: ["/((?!login|welcome|api/auth|api/mcp|_next/static|_next/image|favicon.ico|robots.txt|.*\\.(?:png|jpg|svg|webp)$).*)"],
+  // Everything except the login, landing and docs pages, auth API, MCP server (it checks API keys itself), and static files and images.
+  matcher: ["/((?!login|welcome|docs|api/auth|api/mcp|_next/static|_next/image|favicon.ico|robots.txt|.*\\.(?:png|jpg|svg|webp)$).*)"],
 };
