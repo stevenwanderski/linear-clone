@@ -73,9 +73,9 @@ export default function WelcomePage() {
             <div className="mt-14 mask-b-from-60% md:mt-20">
               <Image
                 src="/board.png"
-                alt={`The ${appName} list view: a project's issues grouped under Todo and Done`}
-                width={2044}
-                height={876}
+                alt={`The ${appName} list view: a Website project's issues grouped under Backlog, Todo, In Progress and Done`}
+                width={2160}
+                height={1280}
                 preload
                 className="rounded-xl border border-border/60 shadow-2xl"
               />
