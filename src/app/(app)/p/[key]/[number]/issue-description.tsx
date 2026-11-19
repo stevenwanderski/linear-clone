@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 function Preview({ text }: { text: string }) {
   if (!text.trim()) return <p className="text-sm text-muted-foreground">No description</p>;
   return (
-    <div className="prose prose-sm max-w-none dark:prose-invert">
+    <div className="prose prose-sm text-[15px]! max-w-none dark:prose-invert">
       <Markdown>{text}</Markdown>
     </div>
   );
