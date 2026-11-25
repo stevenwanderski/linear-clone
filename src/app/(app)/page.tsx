@@ -1,55 +1,70 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { CircleCheckIcon, ListTodoIcon } from "lucide-react";
-import { Placeholder } from "@/components/placeholder";
+import { issueStatus } from "@/db/schema";
+import { StatusIcon } from "@/components/issue-icons";
 import { ProjectBadge } from "@/components/project-badge";
-import { buttonVariants } from "@/components/ui/button";
 import { PageHeader } from "@/components/page-header";
 import { requireUser } from "@/lib/auth";
 import { listIssues, listProjects } from "@/lib/issues";
+import { statusLabels } from "@/lib/labels";
 import { FirstProject } from "./first-project";
-import { IssueGroups, ListSkeleton } from "./issue-groups";
+import { ListSkeleton } from "./issue-groups";
 
-async function OpenIssues() {
+async function ProjectCards() {
   const user = await requireUser();
-  const [projects, issues] = await Promise.all([listProjects(user.id), listIssues(user.id, { openOnly: true })]);
-  // A brand-new account: "everything is done" would be wrong, so point at the first step instead.
+  const [projects, issues] = await Promise.all([listProjects(user.id), listIssues(user.id)]);
   if (projects.length === 0) return <FirstProject />;
-  if (issues.length > 0) return <IssueGroups rows={issues} showProject />;
 
-  // No open issues: either all done, or none made yet. Only the second case needs a nudge.
-  const neverMadeOne = (await listIssues(user.id)).length === 0;
-  if (!neverMadeOne) {
-    return (
-      <Placeholder icon={<CircleCheckIcon />} title="All caught up">
-        No open issues across your projects. Everything is done or canceled.
-      </Placeholder>
-    );
-  }
-  const first = projects[0];
   return (
-    <Placeholder
-      icon={<ListTodoIcon />}
-      title="No issues yet"
-      action={
-        <Link href={`/p/${first.key}`} className={buttonVariants()}>
-          <ProjectBadge projectKey={first.key} color={first.color} />
-          Open {first.name}
-        </Link>
-      }
-    >
-      Open issues from all your projects show up here. Add your first one in a project.
-    </Placeholder>
+    <div className="grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
+      {projects.map((project) => {
+        const mine = issues.filter((issue) => issue.projectId === project.id);
+        const count = (status: string) => mine.filter((issue) => issue.status === status).length;
+        // Canceled issues aren't work left to do, so they don't count toward progress.
+        const total = mine.length - count("canceled");
+        const percent = total === 0 ? 0 : Math.round((count("done") / total) * 100);
+
+        return (
+          <Link
+            key={project.id}
+            href={`/p/${project.key}`}
+            className="grid gap-3 rounded-lg border p-4 transition-colors hover:bg-accent"
+          >
+            <div className="flex items-center gap-2 font-medium">
+              <ProjectBadge projectKey={project.key} color={project.color} />
+              <span className="truncate">{project.name}</span>
+              <span className="ml-auto text-xs text-muted-foreground">{project.key}</span>
+            </div>
+            <div className="grid gap-1">
+              <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+                <div className="h-full rounded-full bg-foreground/70" style={{ width: `${percent}%` }} />
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {count("done")} of {total} done · {percent}%
+              </span>
+            </div>
+            <ul className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              {issueStatus.enumValues.map((status) => (
+                <li key={status} className="flex items-center gap-1" title={statusLabels[status]}>
+                  <StatusIcon status={status} />
+                  {count(status)}
+                </li>
+              ))}
+            </ul>
+          </Link>
+        );
+      })}
+    </div>
   );
 }
 
-// Every open issue across your projects. Login lands here.
+// One card per project with its progress. Login lands here.
 export default function Home() {
   return (
     <main>
-      <PageHeader title="Open issues" />
+      <PageHeader title="Projects" />
       <Suspense fallback={<ListSkeleton />}>
-        <OpenIssues />
+        <ProjectCards />
       </Suspense>
     </main>
   );

@@ -33,7 +33,7 @@ const sections: NavSection[] = [
     { id: "delete-issue", title: "Delete an issue" },
   ] },
   { id: "views", title: "Views", group: "Basics", subs: [
-    { id: "open-issues", title: "Open issues" },
+    { id: "projects-overview", title: "Projects overview" },
     { id: "list-view", title: "List view" },
     { id: "board-view", title: "Board view" },
   ] },
@@ -207,10 +207,10 @@ export default function DocsPage() {
           </Section>
 
           <Section id="views" title="Views">
-            <Sub id="open-issues" title="Open issues">
+            <Sub id="projects-overview" title="Projects overview">
               <p>
-                The home page lists open issues from all your projects, grouped by status, with each issue&apos;s project
-                beside it. Click the {appName} logo to get back to it.
+                The home page shows a card for each project, with how much of it is done and how many issues are in each
+                status. Click a card to open the project, or the {appName} logo to get back.
               </p>
             </Sub>
             <Sub id="list-view" title="List view">
