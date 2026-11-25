@@ -1,12 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { issueStatus } from "@/db/schema";
-import { StatusIcon } from "@/components/issue-icons";
 import { ProjectBadge } from "@/components/project-badge";
 import { PageHeader } from "@/components/page-header";
 import { requireUser } from "@/lib/auth";
 import { listIssues, listProjects } from "@/lib/issues";
-import { statusLabels } from "@/lib/labels";
 import { FirstProject } from "./first-project";
 import { ListSkeleton } from "./issue-groups";
 
@@ -43,14 +40,6 @@ async function ProjectCards() {
                 {count("done")} of {total} done · {percent}%
               </span>
             </div>
-            <ul className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-              {issueStatus.enumValues.map((status) => (
-                <li key={status} className="flex items-center gap-1" title={statusLabels[status]}>
-                  <StatusIcon status={status} />
-                  {count(status)}
-                </li>
-              ))}
-            </ul>
           </Link>
         );
       })}

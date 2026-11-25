@@ -209,8 +209,7 @@ export default function DocsPage() {
           <Section id="views" title="Views">
             <Sub id="projects-overview" title="Projects overview">
               <p>
-                The home page shows a card for each project, with how much of it is done and how many issues are in each
-                status. Click a card to open the project, or the {appName} logo to get back.
+                The home page shows a card for each project, with how much of it is done. Click a card to open the project, or the {appName} logo to get back.
               </p>
             </Sub>
             <Sub id="list-view" title="List view">
